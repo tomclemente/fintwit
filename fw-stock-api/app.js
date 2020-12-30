@@ -47,14 +47,17 @@ exports.handler = async (event, context) => {
                         getUser().then(function(data) {
                             if (!isEmpty(data)) {
                                 if  (data[0].subscriptionStatus == 'ACTIVE') {
+
                                     if (!isEmpty(params.watchlist) && params.watchlist == 'Y') {
                                         return getWatchList(data[0].username);
                                     } else if (!isEmpty(params.ticker)) {
                                         return getTicker(params);
+                                    } else  {
+                                        return getStockList();
                                     }
 
-                                } else if (isEmpty(params)) {
-                                    return getStockList();
+                                } else {
+                                    throw new Error("Not authorized");
                                 }
                             } else {
                                 throw new Error("User not found found. Unable to perform operation");
@@ -127,8 +130,8 @@ function getWatchList(username) {
 
     sql = "SELECT s.*,sm.* FROM Stock s \
            INNER JOIN Stock_Master sm on s.ticker = sm.ticker \
-           INNER JOIN Watchlist w on s.ticker = w.ticker \
-           WHERE w.username = '" + username + "'";
+           WHERE s.ticker in (Select ticker from Watchlist WHERE username = '" + username + "')";
+          
            
     return executeQuery(sql);
 }
