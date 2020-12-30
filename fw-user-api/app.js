@@ -80,7 +80,9 @@ exports.handler = async (event, context) => {
                                 }, reject);
                                 
                             } else {
-                                throw new Error("Existing user found. Unable to perform POST operation");
+                                getUser().then(function(data) {
+                                    resolve(data);
+                                }, reject);
                             }       
 
                         }).catch(err => {
@@ -126,7 +128,7 @@ exports.handler = async (event, context) => {
                         getUser().then(async function(data) {                         
                             if (!isEmpty(data)) {
                                 resp = deleteUser(data[0].username);                            
-                                //await deleteCognitoUser();
+                                await deleteCognitoUser();
                                 await sendEmail(generateGoodbyeEmail());
 
                             } else {
@@ -264,7 +266,7 @@ function insertUser(username, name, email) {
 function generateThankYouEmail() {
     var param = {
         Destination: {
-            ToAddresses: [userid]
+            ToAddresses: [femail]
         },
         Message: {
             Body: {
@@ -283,7 +285,7 @@ function generateThankYouEmail() {
 function generateDeactivateEmail() {
     var param = {
         Destination: {
-            ToAddresses: [userid]
+            ToAddresses: [femail]
         },
         Message: {
             Body: {
@@ -302,7 +304,7 @@ function generateDeactivateEmail() {
 function generatePlanChangeEmail() {
     var param = {
         Destination: {
-            ToAddresses: [userid]
+            ToAddresses: [femail]
         },
         Message: {
             Body: {
@@ -321,7 +323,7 @@ function generatePlanChangeEmail() {
 function generateGoodbyeEmail() {
     var param = {
         Destination: {
-            ToAddresses: [userid]
+            ToAddresses: [femail]
         },
         Message: {
             Body: {
