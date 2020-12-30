@@ -75,7 +75,7 @@ exports.handler = async (event, context) => {
                     case 'POST':      
                         getUser().then(function(data) {
                             if (isEmpty(data)) {
-                                return insertUser(userid,fname,femail).then(async function(resp) {                                    
+                                return insertUser(data[0].username,fname,femail).then(async function(resp) {                                    
                                     await sendEmail(generateThankYouEmail()).then(resolve(resp), reject);
                                 }, reject);
                                 
