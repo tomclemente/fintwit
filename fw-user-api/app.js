@@ -248,7 +248,7 @@ function getUser() {
     return executeQuery(sql);
 }
 
-function insertUser(username, name, org) {
+function insertUser(username, name, email) {
     var post = {
                 username: username, 
                 name: name, 
