@@ -148,6 +148,6 @@ function insertPayment(username, params) {
 }
 
 function getUser() {
-    sql = "SELECT * FROM User WHERE email = '" + userid + "'";
+    sql = "SELECT * FROM User WHERE username = '" + userid + "'";
     return executeQuery(sql);
 }
