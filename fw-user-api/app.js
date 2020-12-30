@@ -18,7 +18,6 @@ var respObj = [];
 var preferenceType = null;
 
 //cognito information
-var forg;
 var fname;
 var femail;
 
@@ -56,13 +55,11 @@ exports.handler = async (event, context) => {
                 for (var x = 0; x < data.UserAttributes.length; x++) {
                     let attrib = data.UserAttributes[x];
 
-                    if (attrib.Name == 'custom:name') {
+                    if (attrib.Name == 'name') {
                         fname = attrib.Value;
                     } else if (attrib.Name == 'email') {
                         femail = attrib.Value;
-                    } else if (attrib.Name == 'custom:Organization') {
-                        forg = attrib.Value;
-                    }
+                    } 
                 }
 
             }).then(function() {
@@ -78,7 +75,7 @@ exports.handler = async (event, context) => {
                     case 'POST':      
                         getUser().then(function(data) {
                             if (isEmpty(data)) {
-                                return insertUser(params).then(async function(resp) {                                    
+                                return insertUser(userid,fname,femail).then(async function(resp) {                                    
                                     await sendEmail(generateThankYouEmail()).then(resolve(resp), reject);
                                 }, reject);
                                 
@@ -247,15 +244,15 @@ function sendEmail(params) {
 };
 
 function getUser() {
-    sql = "SELECT * FROM User WHERE email = '" + userid + "'";
+    sql = "SELECT * FROM User WHERE username = '" + userid + "'";
     return executeQuery(sql);
 }
 
-function insertUser(params) {
+function insertUser(username, name, org) {
     var post = {
-                username: params.username, 
-                name: params.name, 
-                email: params.email, 
+                username: username, 
+                name: name, 
+                email: email, 
                 notificationFlag: "Y", 
                 userType: "USER"
             };
