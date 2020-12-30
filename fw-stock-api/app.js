@@ -63,6 +63,8 @@ exports.handler = async (event, context) => {
                                 throw new Error("User not found found. Unable to perform operation");
                             }       
 
+                        }, reject).then(function() {
+                            resolve(resp);
                         }).catch(err => {
                             reject({ statusCode: 500, body: err.message });
                         }); 
