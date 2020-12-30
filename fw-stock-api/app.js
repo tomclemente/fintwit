@@ -47,7 +47,7 @@ exports.handler = async (event, context) => {
                         getUser().then(function(data) {
                             if (!isEmpty(data)) {
                                 if  (data[0].subscriptionStatus == 'ACTIVE') {
-                                    if (params.watchlist == 'Y') {
+                                    if (!isEmpty(params.watchlist) && params.watchlist == 'Y') {
                                         return getWatchList(data[0].username);
                                     } else if (!isEmpty(params.ticker)) {
                                         return getTicker(params);
@@ -118,19 +118,24 @@ function executeQuery(sql) {
 };
 
 function getUser() {
-    sql = "SELECT * FROM User WHERE email = '" + userid + "'";
+    sql = "SELECT * FROM User WHERE username = '" + userid + "'";
     return executeQuery(sql);
 }
 
 function getWatchList(username) {
-    sql = "SELECT * FROM Stock INNER JOIN Watchlist \
-            ON Stock.ticker = Watchlist.ticker \
-            AND Watchlist.username = '" + username + "'";
+   
+
+    sql = "SELECT s.*,sm.* FROM Stock s \
+           INNER JOIN Stock_Master sm on s.ticker = sm.ticker \
+           INNER JOIN Watchlist w on s.ticker = w.ticker \
+           WHERE w.username = '" + username + "'";
+           
     return executeQuery(sql);
 }
 
 function getStockList() {
-    sql = "SELECT * FROM Stock";
+    sql = "SELECT * FROM Stock s INNER JOIN Stock_Master sm on s.ticker = sm.ticker";
+
     return executeQuery(sql);
 }
 
