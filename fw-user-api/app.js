@@ -73,16 +73,16 @@ exports.handler = async (event, context) => {
                     break;
 
                     case 'POST':      
-                        getUser().then(function(data) {
+                        getUser().then(async function(data) {
                             if (isEmpty(data)) {
-                                return insertUser(userid,fname,femail).then(async function(resp) {                                    
-                                    await sendEmail(generateThankYouEmail()).then(resolve(resp), reject);
-                                }, reject);
-                                
+
+                                await insertUser(userid, fname, femail);
+                                await sendEmail(generateThankYouEmail());
+                                const resp = await getUser();
+                                resolve(resp);
+                            
                             } else {
-                                getUser().then(function(data) {
-                                    resolve(data);
-                                }, reject);
+                                resolve(data);
                             }       
 
                         }).catch(err => {

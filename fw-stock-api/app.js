@@ -12,6 +12,7 @@ var pool = mysql.createPool({
 
 var sql;
 var userid;
+var resp;
 
 exports.handler = async (event, context) => {
 
@@ -44,16 +45,16 @@ exports.handler = async (event, context) => {
 
                 switch (event.httpMethod) {
                     case 'POST':      
-                        getUser().then(function(data) {
+                        getUser().then(async function(data) {
                             if (!isEmpty(data)) {
                                 if  (data[0].subscriptionStatus == 'ACTIVE') {
 
                                     if (!isEmpty(params.watchlist) && params.watchlist == 'Y') {
-                                        return getWatchList(data[0].username);
+                                        resp = await getWatchList(data[0].username);
                                     } else if (!isEmpty(params.ticker)) {
-                                        return getTicker(params);
+                                        resp = await getTicker(params);
                                     } else  {
-                                        return getStockList();
+                                        resp = await getStockList();
                                     }
 
                                 } else {
