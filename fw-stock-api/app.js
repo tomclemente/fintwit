@@ -49,9 +49,9 @@ exports.handler = async (event, context) => {
                             if (!isEmpty(data)) {
                                 if  (data[0].subscriptionStatus == 'ACTIVE') {
 
-                                    if (!isEmpty(params.watchlist) && params.watchlist == 'Y') {
+                                    if (!isEmpty(params) && params.watchlist == 'Y') {
                                         resp = await getWatchList(data[0].username);
-                                    } else if (!isEmpty(params.ticker)) {
+                                    } else if (!isEmpty(params) && !isEmpty(params.ticker)) {
                                         resp = await getTicker(params);
                                     } else  {
                                         resp = await getStockList();
