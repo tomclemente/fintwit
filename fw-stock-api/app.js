@@ -131,16 +131,42 @@ function getUser() {
 function getWatchList(username) {
    
 
-    sql = "SELECT s.*,sm.* FROM Stock s \
-           INNER JOIN Stock_Master sm on s.ticker = sm.ticker \
-           WHERE s.ticker in (Select ticker from Watchlist WHERE username = '" + username + "')";
+    sql = "(SELECT s.coverage,s.reach,s.rank,s.rankChange,s.bullish,s.bearish,s.category,sm.*,CASE WHEN w.ticker IS NULL THEN false ELSE true END AS watchlist \
+            FROM fintwit.Stock s \
+            INNER JOIN fintwit.Stock_Master sm on s.ticker = sm.ticker AND s.category = 'Portfolio' \
+            INNER JOIN fintwit.Watchlist w on s.ticker = w.ticker \
+            limit 100) UNION ALL \
+          (SELECT s.coverage,s.reach,s.rank,s.rankChange,s.bullish,s.bearish,s.category,sm.*,CASE WHEN w.ticker IS NULL THEN false ELSE true END AS watchlist \
+            FROM fintwit.Stock s \
+            INNER JOIN fintwit.Stock_Master sm on s.ticker = sm.ticker and s.category = 'Sentiment' \
+            INNER JOIN fintwit.Watchlist w on s.ticker = w.ticker \
+            limit 100) UNION ALL \
+           (SELECT s.coverage,s.reach,s.rank,s.rankChange,s.bullish,s.bearish,s.category,sm.*,CASE WHEN w.ticker IS NULL THEN false ELSE true END AS watchlist \
+            FROM fintwit.Stock s  \
+            INNER JOIN fintwit.Stock_Master sm on s.ticker = sm.ticker and s.category = 'Trending' \
+            INNER JOIN fintwit.Watchlist w on s.ticker = w.ticker \
+            limit 100)"
           
            
     return executeQuery(sql);
 }
 
 function getStockList() {
-    sql = "SELECT * FROM Stock s INNER JOIN Stock_Master sm on s.ticker = sm.ticker";
+    sql = "(SELECT s.coverage,s.reach,s.rank,s.rankChange,s.bullish,s.bearish,s.category,sm.*,CASE WHEN w.ticker IS NULL THEN false ELSE true END AS watchlist \
+            FROM fintwit.Stock s \
+            INNER JOIN fintwit.Stock_Master sm on s.ticker = sm.ticker AND s.category = 'Portfolio' \
+            LEFT OUTER JOIN fintwit.Watchlist w on s.ticker = w.ticker \
+            limit 100) UNION ALL \
+          (SELECT s.coverage,s.reach,s.rank,s.rankChange,s.bullish,s.bearish,s.category,sm.*,CASE WHEN w.ticker IS NULL THEN false ELSE true END AS watchlist \
+            FROM fintwit.Stock s \
+            INNER JOIN fintwit.Stock_Master sm on s.ticker = sm.ticker and s.category = 'Sentiment' \
+            LEFT OUTER JOIN fintwit.Watchlist w on s.ticker = w.ticker \
+            limit 100) UNION ALL \
+           (SELECT s.coverage,s.reach,s.rank,s.rankChange,s.bullish,s.bearish,s.category,sm.*,CASE WHEN w.ticker IS NULL THEN false ELSE true END AS watchlist \
+            FROM fintwit.Stock s  \
+            INNER JOIN fintwit.Stock_Master sm on s.ticker = sm.ticker and s.category = 'Trending' \
+            LEFT OUTER JOIN fintwit.Watchlist w on s.ticker = w.ticker \
+            limit 100)"
 
     return executeQuery(sql);
 }
