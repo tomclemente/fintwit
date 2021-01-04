@@ -192,24 +192,37 @@ function  updateInsight(params) {
 function getInsight() {
     sql = "SELECT * FROM Insight  \
             WHERE class = 'PORTFOLIO' \
-            AND processed is null";
+            AND processed is null LIMIT 100";
 
     return executeQuery(sql);
 }
 
 function getInsightParams(params) {
+    let cond = "";
+
+    if (!isEmpty(params.date)) {
+        cond = cond.concat(" AND date = '" + params.date + "'");
+    }
+     if (!isEmpty(params.tUserName)) {
+        cond = cond.concat(" AND tUserName = '" + params.tUserName + "'");
+    }
+     if (!isEmpty(params.class)) {
+        cond = cond.concat(" AND class = '" + params.class + "'");
+    }
+     if (!isEmpty(params.processed)) {
+        cond = cond.concat(" AND processed = '" + params.processed + "'");
+    }
+    cond = cond.concat(" LIMIT 100");
+
     sql = "SELECT * FROM Insight \
-            WHERE date = '" + params.date + "' \
-            AND tUserName = '" + params.tUserName + "' \
-            AND class = '" + params.class + "' \
-            AND processed = '" + params.processed + "' ";
+            WHERE rawTweet is not null " + cond + "";
 
     return executeQuery(sql);
 }
 
 function deleteInsight(params) {
     sql = "DELETE FROM Insight \
-            WHERE id = '" + params.id + "' ";
+            WHERE ID = '" + params.id + "' ";
             
     return executeQuery(sql);
 }
