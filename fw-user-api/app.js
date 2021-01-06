@@ -478,7 +478,7 @@ function generateThankYouEmail() {
                                             <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px; font-family: Arial, sans-serif"><![endif]-->
                                             <div style="color:#FFFFFF;font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;line-height:1.5;padding-top:10px;padding-right:10px;padding-bottom:10px;padding-left:10px;">
                                                 <div style="line-height: 1.5; font-size: 12px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #FFFFFF; mso-line-height-alt: 18px;">
-                                                    <p style="line-height: 1.5; word-break: break-word; text-align: center; font-family: Helvetica; font-size: 15px; mso-line-height-alt: 23px; margin: 0;"><span style="font-size: 14px;">We use advanced Artificial Intelligence algorithms to process hundreds of thousands of tweets from Fintwit community and the surface the most relevant and trending securies in real time.</span></p>
+                                                    <p style="line-height: 1.5; word-break: break-word; text-align: center; font-family: Helvetica; font-size: 15px; mso-line-height-alt: 23px; margin: 0;"><span style="font-size: 14px;">We use advanced Artificial Intelligence algorithms to process hundreds of thousands of tweets from Fintwit community and surface the most relevant and trending securities in real time.</span></p>
                                                 </div>
                                             </div>
                                             <!--[if mso]></td></tr></table><![endif]-->
@@ -1382,7 +1382,11 @@ function generateGoodbyeEmail() {
                                             <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px; font-family: Arial, sans-serif"><![endif]-->
                                             <div style="color:#FFFFFF;font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;line-height:1.5;padding-top:10px;padding-right:10px;padding-bottom:10px;padding-left:10px;">
                                                 <div style="line-height: 1.5; font-size: 12px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #FFFFFF; mso-line-height-alt: 18px;">
-                                                    <p style="line-height: 1.5; word-break: break-word; text-align: center; font-family: Helvetica; font-size: 15px; mso-line-height-alt: 23px; margin: 0;"><span style="font-size: 14px;">Your account has been deactivated and all your information has been deleted from our system. We hope to see you back on Fintwit soon!.</span></p>
+                                                    <p style="line-height: 1.5; word-break: break-word; text-align: center; font-family: Helvetica; font-size: 15px; mso-line-height-alt: 23px; margin: 0;"><span style="font-size: 14px;">Your account has been deactivated and all your information has been deleted from our system.</span></p>
+                                                </div>
+                                                <p style="line-height: 1.5; font-family: Helvetica; word-break: break-word; mso-line-height-alt: 18px; margin: 0;">&nbsp;</p>
+                                                <div style="line-height: 1.5; font-size: 12px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #FFFFFF; mso-line-height-alt: 18px;">
+                                                    <p style="line-height: 1.5; word-break: break-word; text-align: center; font-family: Helvetica; font-size: 15px; mso-line-height-alt: 23px; margin: 0;"><span style="font-size: 14px;">We hope to see you back on Fintwit soon!</span></p>
                                                 </div>
                                             </div>
                                             <!--[if mso]></td></tr></table><![endif]-->
