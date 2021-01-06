@@ -2,8 +2,8 @@ version = 0.1
 [default]
 [default.deploy]
 [default.deploy.parameters]
-stack_name = "fintwit"
+stack_name = "fw-payment-api"
 s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-1jk2etunsj44n"
-s3_prefix = "fintwit"
+s3_prefix = "fw-payment-api"
 region = "us-east-1"
 capabilities = "CAPABILITY_IAM"

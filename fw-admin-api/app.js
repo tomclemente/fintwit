@@ -80,6 +80,7 @@ exports.handler = async (event, context) => {
                         reject({ statusCode: 500, body: err.message });
                     });
 
+                break; 
 
                 case 'DELETE':
                     getUser().then(function(data) {
@@ -99,6 +100,8 @@ exports.handler = async (event, context) => {
                     }, reject).catch(err => {
                         reject({ statusCode: 500, body: err.message });
                     });
+                    
+                break;
 
                 default:
                     throw new Error(`Unsupported method "${event.httpMethod}"`);

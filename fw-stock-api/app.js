@@ -12,7 +12,7 @@ var pool = mysql.createPool({
 
 var sql;
 var userid;
-var resp;
+var resp = {};
 
 exports.handler = async (event, context) => {
 
@@ -51,12 +51,16 @@ exports.handler = async (event, context) => {
 
                                     if (!isEmpty(params) && params.watchlist == 'Y') {
                                         resp = await getWatchList(data[0].username);
-                                    } else if (!isEmpty(params) && !isEmpty(params.ticker)) {
-                                        resp = await getTicker(params);
+                                    } else if (!isEmpty(params) && !isEmpty(params.ticker)) {     
+                                        resp["Stock"] = await getStockMaster(params.ticker);
+                                        resp["Portfolio"] = await getPortfolio(params.ticker);                                        
+                                        resp["Sentiment"] = await getSentiment(params.ticker);
+                                        resp["Trending"] = await getTrending(params.ticker);
+                                        resp["Price"] = await getPrice(params.ticker);
                                     } else  {
                                         resp = await getStockList();
                                     }
-
+                                
                                 } else {
                                     throw new Error("Not authorized");
                                 }
@@ -174,5 +178,40 @@ function getStockList() {
 function getTicker(params) {
     sql = "SELECT * FROM StockChart \
             WHERE ticker = '" + params.ticker + "'";
+    return executeQuery(sql);
+}
+
+function getStockMaster(ticker) {
+    sql = "SELECT sm.*, CASE WHEN w.ticker IS NULL THEN false ELSE true END AS watchlist \
+            FROM Stock_Master sm \
+            LEFT OUTER JOIN Watchlist w on sm.ticker = w.ticker \
+            WHERE sm.ticker = '" + ticker + "' ";
+    return executeQuery(sql);
+}
+
+function getPortfolio(ticker) {
+    sql = "SELECT * FROM fintwit.StockChart \
+            WHERE category = 'Portfolio' \
+            AND ticker = '" + ticker + "' ";
+    return executeQuery(sql);
+}
+
+function getSentiment(ticker) {
+    sql = "SELECT * FROM fintwit.StockChart \
+            WHERE category = 'Sentiment' \
+            AND ticker = '" + ticker + "' ";
+    return executeQuery(sql);
+}
+
+function getTrending(ticker) {
+    sql = "SELECT * FROM fintwit.StockChart \
+            WHERE category = 'Trending' \
+            AND ticker = '" + ticker + "' ";
+    return executeQuery(sql);
+}
+
+function getPrice(ticker) {
+    sql = "SELECT * FROM Timeseries \
+            WHERE ticker = '" + ticker + "'";
     return executeQuery(sql);
 }

@@ -14,8 +14,6 @@ var pool = mysql.createPool({
 
 var sql;
 var userid;
-var respObj = [];
-var preferenceType = null;
 
 //cognito information
 var fname;
@@ -130,6 +128,7 @@ exports.handler = async (event, context) => {
                                 resp = deleteUser(data[0].username);                            
                                 await deleteCognitoUser();
                                 await sendEmail(generateGoodbyeEmail());
+                                await deleteWatchlist(data[0].username);
 
                             } else {
                                 throw new Error("User is non existent. Unable to perform DELETE operation");
@@ -1502,4 +1501,9 @@ function deleteCognitoUser() {
         UserPoolId: process.env.COGNITO_POOLID,
         Username: userid,
     }).promise();
+}
+
+function deleteWatchlist(username) {
+    sql = "DELETE FROM Watchlist WHERE username = '" + username + "' ";
+    return executeQuery(sql);
 }
