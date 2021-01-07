@@ -57,6 +57,13 @@ exports.handler = async (event, context) => {
                                         resp["Sentiment"] = await getSentiment(params.ticker);
                                         resp["Trending"] = await getTrending(params.ticker);
                                         resp["Price"] = await getPrice(params.ticker);
+
+                                        resp["Price"]["5m"] = await getTimeSeries('5m', params.ticker);
+                                        resp["Price"]["30m"] = await getTimeSeries('30m', params.ticker);
+                                        resp["Price"]["Daily"] = await getTimeSeries('Daily', params.ticker);
+                                        resp["Price"]["Weekly"] = await getTimeSeries('Weekly', params.ticker);
+
+
                                     } else  {
                                         resp = await getStockList();
                                     }
@@ -213,5 +220,12 @@ function getTrending(ticker) {
 function getPrice(ticker) {
     sql = "SELECT * FROM Timeseries \
             WHERE ticker = '" + ticker + "'";
+    return executeQuery(sql);
+}
+
+function getTimeSeries(granularity, ticker) {
+    sql = "SELECT * FROM Timeseries \
+            WHERE granularity = '"+ granularity + "' \
+            AND ticker = '" + ticker + "'";
     return executeQuery(sql);
 }
