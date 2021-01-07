@@ -12,7 +12,9 @@ var pool = mysql.createPool({
 
 var sql;
 var userid;
-var resp = {};
+var resp = new Object();
+var price = new Array();
+var timedata = new Object();
 
 exports.handler = async (event, context) => {
 
@@ -56,14 +58,21 @@ exports.handler = async (event, context) => {
                                         resp["Portfolio"] = await getPortfolio(params.ticker);                                        
                                         resp["Sentiment"] = await getSentiment(params.ticker);
                                         resp["Trending"] = await getTrending(params.ticker);
-                                        resp["Price"] = await getPrice(params.ticker);
+        
+                                        timedata["5m"] = await getTimeSeries('5m', params.ticker);
+                                        price.push(timedata);
 
-                                        resp["Price"]["5m"] = await getTimeSeries('5m', params.ticker);
-                                        resp["Price"]["30m"] = await getTimeSeries('30m', params.ticker);
-                                        resp["Price"]["Daily"] = await getTimeSeries('Daily', params.ticker);
-                                        resp["Price"]["Weekly"] = await getTimeSeries('Weekly', params.ticker);
+                                        timedata["30m"] = await getTimeSeries('30m', params.ticker);
+                                        price.push(timedata);
 
+                                        timedata["Daily"] = await getTimeSeries('Daily', params.ticker);
+                                        price.push(timedata);
 
+                                        timedata["Weekly"] = await getTimeSeries('Weekly', params.ticker);
+                                        price.push(timedata);
+
+                                        resp["Price"] = price;
+                                        
                                     } else  {
                                         resp = await getStockList();
                                     }
@@ -224,6 +233,8 @@ function getPrice(ticker) {
 }
 
 function getTimeSeries(granularity, ticker) {
+    timedata = new Object();
+
     sql = "SELECT * FROM Timeseries \
             WHERE granularity = '"+ granularity + "' \
             AND ticker = '" + ticker + "'";
