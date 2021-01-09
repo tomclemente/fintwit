@@ -13,8 +13,14 @@ var pool = mysql.createPool({
 var sql;
 var userid;
 var resp = new Object();
-var price = new Array();
 var timedata = new Object();
+
+var price = {
+    '5m': [],
+    '30m': [],
+    'Daily': [],
+    'Weekly': []
+};
 
 exports.handler = async (event, context) => {
 
@@ -53,23 +59,24 @@ exports.handler = async (event, context) => {
 
                                     if (!isEmpty(params) && params.watchlist == 'Y') {
                                         resp = await getWatchList(data[0].username);
+                                        
                                     } else if (!isEmpty(params) && !isEmpty(params.ticker)) {     
                                         resp["Stock"] = await getStockMaster(params.ticker);
                                         resp["Portfolio"] = await getPortfolio(params.ticker);                                        
                                         resp["Sentiment"] = await getSentiment(params.ticker);
                                         resp["Trending"] = await getTrending(params.ticker);
         
-                                        timedata["5m"] = await getTimeSeries('5m', params.ticker);
-                                        price.push(timedata);
+                                        timedata = await getTimeSeries('5m', params.ticker);
+                                        price['5m'] = timedata;
 
-                                        timedata["30m"] = await getTimeSeries('30m', params.ticker);
-                                        price.push(timedata);
+                                        timedata = await getTimeSeries('30m', params.ticker);
+                                        price['30m'] = timedata;
 
-                                        timedata["Daily"] = await getTimeSeries('Daily', params.ticker);
-                                        price.push(timedata);
+                                        timedata = await getTimeSeries('Daily', params.ticker);
+                                        price['Daily'] = timedata;
 
-                                        timedata["Weekly"] = await getTimeSeries('Weekly', params.ticker);
-                                        price.push(timedata);
+                                        timedata = await getTimeSeries('Weekly', params.ticker);
+                                        price['Weekly'] = timedata;
 
                                         resp["Price"] = price;
                                         
