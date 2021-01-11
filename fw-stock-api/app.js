@@ -56,7 +56,8 @@ exports.handler = async (event, context) => {
                         getUser().then(async function(data) {
                             if (!isEmpty(data)) {
                                 if  (data[0].subscriptionStatus == 'ACTIVE') {
-
+                                    resp = new Object();
+                                    
                                     if (!isEmpty(params) && params.watchlist == 'Y') {
                                         resp = await getWatchList(data[0].username);
                                         
@@ -240,8 +241,6 @@ function getPrice(ticker) {
 }
 
 function getTimeSeries(granularity, ticker) {
-    timedata = new Object();
-
     sql = "SELECT * FROM Timeseries \
             WHERE granularity = '"+ granularity + "' \
             AND ticker = '" + ticker + "'";
