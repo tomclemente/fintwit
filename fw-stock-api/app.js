@@ -60,13 +60,18 @@ exports.handler = async (event, context) => {
                                     
                                     if (!isEmpty(params) && params.watchlist == 'Y') {
                                         resp = await getWatchList(data[0].username);
-                                        
+
+                                    } else if (!isEmpty(params) && !isEmpty(params.search))
+                                        resp = await getSearchList(params.search);
+
                                     } else if (!isEmpty(params) && !isEmpty(params.ticker)) {     
                                         resp["Stock"] = await getStockMaster(params.ticker);
                                         resp["Portfolio"] = await getPortfolio(params.ticker);                                        
                                         resp["Sentiment"] = await getSentiment(params.ticker);
                                         resp["Trending"] = await getTrending(params.ticker);
-        
+                                        resp["Tweet"] = await getTweet(params.ticker);
+                                        resp["Mention"] = await getMention(params.ticker);
+
                                         timedata = await getTimeSeries('5m', params.ticker);
                                         price['5m'] = timedata;
 
@@ -156,6 +161,16 @@ function getUser() {
     return executeQuery(sql);
 }
 
+function getSearchList(search) {
+   
+
+    sql = "SELECT ticker, company \
+            FROM Stock_Master \
+            where LOWER(ticker) LIKE '" + search + "%' OR LOWER(company) LIKE '" + search + "%'";
+          
+    return executeQuery(sql);
+}
+
 function getWatchList(username) {
    
 
@@ -163,16 +178,19 @@ function getWatchList(username) {
             FROM Stock s \
             INNER JOIN Stock_Master sm on s.ticker = sm.ticker AND s.category = 'Portfolio' \
             INNER JOIN Watchlist w on s.ticker = w.ticker AND w.username = '" + userid + "' \
+            where sm.isActive != 'N'\
             limit 100) UNION ALL \
           (SELECT s.coverage,s.reach,s.bullish,s.bearish,s.category,sm.*,CASE WHEN w.ticker IS NULL THEN false ELSE true END AS watchlist \
             FROM Stock s \
             INNER JOIN Stock_Master sm on s.ticker = sm.ticker and s.category = 'Sentiment' \
             INNER JOIN Watchlist w on s.ticker = w.ticker AND w.username = '" + userid + "'\
+            where sm.isActive != 'N'\
             limit 100) UNION ALL \
            (SELECT s.coverage,s.reach,s.bullish,s.bearish,s.category,sm.*,CASE WHEN w.ticker IS NULL THEN false ELSE true END AS watchlist \
             FROM Stock s  \
             INNER JOIN Stock_Master sm on s.ticker = sm.ticker and s.category = 'Trending' \
             INNER JOIN Watchlist w on s.ticker = w.ticker AND w.username = '" + userid + "'\
+            where sm.isActive != 'N'\
             limit 100)"
           
            
@@ -183,17 +201,20 @@ function getStockList() {
     sql = "(SELECT s.coverage,s.reach,s.bullish,s.bearish,s.category,sm.*,CASE WHEN w.ticker IS NULL THEN false ELSE true END AS watchlist \
             FROM Stock s \
             INNER JOIN Stock_Master sm on s.ticker = sm.ticker AND s.category = 'Portfolio' \
-            LEFT OUTER JOIN fintwit.Watchlist w on s.ticker = w.ticker AND w.username = '" + userid + "'\
+            LEFT OUTER JOIN Watchlist w on s.ticker = w.ticker AND w.username = '" + userid + "'\
+            where sm.isActive != 'N'\
             limit 100) UNION ALL \
           (SELECT s.coverage,s.reach,s.bullish,s.bearish,s.category,sm.*,CASE WHEN w.ticker IS NULL THEN false ELSE true END AS watchlist \
             FROM Stock s \
             INNER JOIN Stock_Master sm on s.ticker = sm.ticker and s.category = 'Sentiment' \
             LEFT OUTER JOIN Watchlist w on s.ticker = w.ticker AND w.username = '" + userid + "'\
+            where sm.isActive != 'N'\
             limit 100) UNION ALL \
            (SELECT s.coverage,s.reach,s.bullish,s.bearish,s.category,sm.*,CASE WHEN w.ticker IS NULL THEN false ELSE true END AS watchlist \
             FROM Stock s  \
             INNER JOIN Stock_Master sm on s.ticker = sm.ticker and s.category = 'Trending' \
             LEFT OUTER JOIN Watchlist w on s.ticker = w.ticker AND w.username = '" + userid + "'\
+            where sm.isActive != 'N'\
             limit 100)"
 
     return executeQuery(sql);
@@ -209,40 +230,65 @@ function getStockMaster(ticker) {
     sql = "SELECT sm.*, CASE WHEN w.ticker IS NULL THEN false ELSE true END AS watchlist \
             FROM Stock_Master sm \
             LEFT OUTER JOIN Watchlist w on sm.ticker = w.ticker AND w.username = '" + userid + "'\
-            WHERE sm.ticker = '" + ticker + "' ";
+            WHERE sm.isActive != 'N' and sm.ticker = '" + ticker + "' ";
     return executeQuery(sql);
 }
 
 function getPortfolio(ticker) {
-    sql = "SELECT * FROM fintwit.StockChart \
-            WHERE category = 'Portfolio' \
-            AND ticker = '" + ticker + "' ";
+    sql = "SELECT sc.* FROM StockChart sc\
+            INNER JOIN Stock_Master sm on sc.ticker = sm.ticker \
+            WHERE sc.category = 'Portfolio' \
+            AND sm.isActive != 'N' \
+            AND sc.ticker = '" + ticker + "' ";
     return executeQuery(sql);
 }
 
 function getSentiment(ticker) {
-    sql = "SELECT * FROM fintwit.StockChart \
-            WHERE category = 'Sentiment' \
-            AND ticker = '" + ticker + "' ";
+    sql = "SELECT sc.* FROM StockChart sc\
+            INNER JOIN Stock_Master sm on sc.ticker = sm.ticker \
+            WHERE sc.category = 'Sentiment' \
+            AND sm.isActive != 'N' \
+            AND sc.ticker = '" + ticker + "' ";
+    return executeQuery(sql);
+}
+
+function getTweet(ticker) {
+    sql = "SELECT i.tweetID from Insight i\
+            INNER JOIN Analyst a on i.tUserID = a.tUserID \
+            INNER JOIN Stock_Master sm on sm.ticker = i.ticker \
+            WHERE sm.isActive != 'N' \
+            AND i.ticker = '" + ticker + "' \
+            ORDER BY a.followerCount DESC \
+            LIMIT 50";
+    return executeQuery(sql);
+}
+
+function getMention(ticker) {
+    sql = "SELECT a.tUserName,a.name,a.profilePicMini,p.dateAdded from Portfolio_Master p\
+            INNER JOIN Analyst a on p.tUserID = a.tUserID \
+            INNER JOIN Stock_Master sm on sm.ticker = p.ticker \
+            WHERE sm.isActive != 'N' \
+            AND p.ticker = '" + ticker + "' \
+            ORDER BY a.followerCount DESC \
+            LIMIT 50";
     return executeQuery(sql);
 }
 
 function getTrending(ticker) {
-    sql = "SELECT * FROM fintwit.StockChart \
-            WHERE category = 'Trending' \
-            AND ticker = '" + ticker + "' ";
+    sql = "SELECT sc.* FROM StockChart sc\
+            INNER JOIN Stock_Master sm on sc.ticker = sm.ticker \
+            WHERE sc.category = 'Trending' \
+            AND sm.isActive != 'N' \
+            AND sc.ticker = '" + ticker + "' ";
     return executeQuery(sql);
 }
 
-function getPrice(ticker) {
-    sql = "SELECT * FROM Timeseries \
-            WHERE ticker = '" + ticker + "'";
-    return executeQuery(sql);
-}
 
 function getTimeSeries(granularity, ticker) {
-    sql = "SELECT * FROM Timeseries \
-            WHERE granularity = '"+ granularity + "' \
-            AND ticker = '" + ticker + "'";
+    sql = "SELECT t.* FROM Timeseries t\
+            INNER JOIN Stock_Master sm on t.ticker = sm.ticker \
+            WHERE sm.isActive != 'N' \
+            AND t.granularity = '"+ granularity + "' \
+            AND t.ticker = '" + ticker + "'";
     return executeQuery(sql);
 }
