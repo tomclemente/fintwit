@@ -61,8 +61,9 @@ exports.handler = async (event, context) => {
                                     if (!isEmpty(params) && params.watchlist == 'Y') {
                                         resp = await getWatchList(data[0].username);
 
-                                    } else if (!isEmpty(params) && !isEmpty(params.search))
+                                    } else if (!isEmpty(params) && !isEmpty(params.search)) {
                                         resp = await getSearchList(params.search);
+                                    
 
                                     } else if (!isEmpty(params) && !isEmpty(params.ticker)) {     
                                         resp["Stock"] = await getStockMaster(params.ticker);
