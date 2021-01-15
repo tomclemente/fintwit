@@ -195,7 +195,7 @@ function  updateInsight(params) {
 function getInsight() {
     sql = "SELECT * FROM Insight  \
             WHERE class = 'PORTFOLIO' \
-            AND processed is null LIMIT 100";
+            AND processed ='N' LIMIT 100";
 
     return executeQuery(sql);
 }
