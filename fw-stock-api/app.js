@@ -175,19 +175,13 @@ function getSearchList(search) {
 function getWatchList(username) {
    
 
-    sql = "(SELECT s.coverage,s.reach,s.bullish,s.bearish,s.category,sm.*,CASE WHEN w.ticker IS NULL THEN false ELSE true END AS watchlist \
+    sql = "(SELECT s.coverage,s.coverageUp,s.reach,s.reachUp,s.bullish,s.bullishUp,s.bearish,s.bearishUp,s.neutral,s.neutralUp,s.category,sm.*,CASE WHEN w.ticker IS NULL THEN false ELSE true END AS watchlist \
             FROM Stock s \
             INNER JOIN Stock_Master sm on s.ticker = sm.ticker AND s.category = 'Portfolio' \
             INNER JOIN Watchlist w on s.ticker = w.ticker AND w.username = '" + userid + "' \
             where sm.isActive != 'N'\
             limit 100) UNION ALL \
-          (SELECT s.coverage,s.reach,s.bullish,s.bearish,s.category,sm.*,CASE WHEN w.ticker IS NULL THEN false ELSE true END AS watchlist \
-            FROM Stock s \
-            INNER JOIN Stock_Master sm on s.ticker = sm.ticker and s.category = 'Sentiment' \
-            INNER JOIN Watchlist w on s.ticker = w.ticker AND w.username = '" + userid + "'\
-            where sm.isActive != 'N'\
-            limit 100) UNION ALL \
-           (SELECT s.coverage,s.reach,s.bullish,s.bearish,s.category,sm.*,CASE WHEN w.ticker IS NULL THEN false ELSE true END AS watchlist \
+           (SELECT s.coverage,s.coverageUp,s.reach,s.reachUp,s.bullish,s.bullishUp,s.bearish,s.bearishUp,s.neutral,s.neutralUp,s.category,sm.*,CASE WHEN w.ticker IS NULL THEN false ELSE true END AS watchlist \
             FROM Stock s  \
             INNER JOIN Stock_Master sm on s.ticker = sm.ticker and s.category = 'Trending' \
             INNER JOIN Watchlist w on s.ticker = w.ticker AND w.username = '" + userid + "'\
@@ -199,19 +193,13 @@ function getWatchList(username) {
 }
 
 function getStockList() {
-    sql = "(SELECT s.coverage,s.reach,s.bullish,s.bearish,s.category,sm.*,CASE WHEN w.ticker IS NULL THEN false ELSE true END AS watchlist \
+    sql = "(SELECT s.coverage,s.coverageUp,s.reach,s.reachUp,s.bullish,s.bullishUp,s.bearish,s.bearishUp,s.neutral,s.neutralUp,s.category,sm.*,CASE WHEN w.ticker IS NULL THEN false ELSE true END AS watchlist \
             FROM Stock s \
             INNER JOIN Stock_Master sm on s.ticker = sm.ticker AND s.category = 'Portfolio' \
             LEFT OUTER JOIN Watchlist w on s.ticker = w.ticker AND w.username = '" + userid + "'\
             where sm.isActive != 'N'\
             limit 100) UNION ALL \
-          (SELECT s.coverage,s.reach,s.bullish,s.bearish,s.category,sm.*,CASE WHEN w.ticker IS NULL THEN false ELSE true END AS watchlist \
-            FROM Stock s \
-            INNER JOIN Stock_Master sm on s.ticker = sm.ticker and s.category = 'Sentiment' \
-            LEFT OUTER JOIN Watchlist w on s.ticker = w.ticker AND w.username = '" + userid + "'\
-            where sm.isActive != 'N'\
-            limit 100) UNION ALL \
-           (SELECT s.coverage,s.reach,s.bullish,s.bearish,s.category,sm.*,CASE WHEN w.ticker IS NULL THEN false ELSE true END AS watchlist \
+           (SELECT s.coverage,s.coverageUp,s.reach,s.reachUp,s.bullish,s.bullishUp,s.bearish,s.bearishUp,s.neutral,s.neutralUp,s.category,sm.*,CASE WHEN w.ticker IS NULL THEN false ELSE true END AS watchlist \
             FROM Stock s  \
             INNER JOIN Stock_Master sm on s.ticker = sm.ticker and s.category = 'Trending' \
             LEFT OUTER JOIN Watchlist w on s.ticker = w.ticker AND w.username = '" + userid + "'\
