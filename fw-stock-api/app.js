@@ -224,7 +224,7 @@ function getStockMaster(ticker) {
 }
 
 function getPortfolio(ticker) {
-    sql = "SELECT sc.* FROM StockChart sc\
+    sql = "SELECT sc.ticker,sc.date,sc.coverage,sc.reach FROM StockChart sc\
             INNER JOIN Stock_Master sm on sc.ticker = sm.ticker \
             WHERE sc.category = 'Portfolio' \
             AND sm.isActive != 'N' \
@@ -233,9 +233,9 @@ function getPortfolio(ticker) {
 }
 
 function getSentiment(ticker) {
-    sql = "SELECT sc.* FROM StockChart sc\
+    sql = "SELECT sc.ticker,sc.date,sc.bullish,sc.bearish,sc.neutral FROM StockChart sc\
             INNER JOIN Stock_Master sm on sc.ticker = sm.ticker \
-            WHERE sc.category = 'Sentiment' \
+            WHERE sc.category = 'Trending' \
             AND sm.isActive != 'N' \
             AND sc.ticker = '" + ticker + "' ";
     return executeQuery(sql);
@@ -264,7 +264,7 @@ function getMention(ticker) {
 }
 
 function getTrending(ticker) {
-    sql = "SELECT sc.* FROM StockChart sc\
+    sql = "SELECT sc.ticker,sc.date,sc.coverage,sc.reach FROM StockChart sc\
             INNER JOIN Stock_Master sm on sc.ticker = sm.ticker \
             WHERE sc.category = 'Trending' \
             AND sm.isActive != 'N' \
