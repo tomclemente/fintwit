@@ -195,7 +195,7 @@ function  updateInsight(params) {
     }
 
     sql = "UPDATE Insight \
-            SET '" + cond + "', \
+            SET " + cond + " \
             WHERE ID = '" + params.id + "'";
 
     return executeQuery(sql);
