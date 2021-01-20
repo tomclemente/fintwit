@@ -184,9 +184,18 @@ function getUser() {
 }
 
 function  updateInsight(params) {
+
+    let cond = "";
+
+    if (!isEmpty(params.class)) {
+        cond = cond.concat(" class = '" + params.class + "'");
+    }
+    if (!isEmpty(params.processed)) {
+        cond = cond.concat(" processed = '" + params.processed + "'");
+    }
+
     sql = "UPDATE Insight \
-            SET class = '" + params.class + "', \
-            processed = '" + params.processed + "' \
+            SET '" + cond + "', \
             WHERE ID = '" + params.id + "'";
 
     return executeQuery(sql);
