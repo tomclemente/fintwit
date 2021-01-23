@@ -66,7 +66,8 @@ exports.handler = async (event, context) => {
                                     
 
                                     } else if (!isEmpty(params) && !isEmpty(params.ticker)) {     
-                                        resp["Stock"] = await getStockMaster(params.ticker);
+                                        var result = await getStockMaster(params.ticker);
+                                        resp = result[0];
                                         resp["Portfolio"] = await getPortfolio(params.ticker);                                        
                                         resp["Sentiment"] = await getSentiment(params.ticker);
                                         resp["Trending"] = await getTrending(params.ticker);
