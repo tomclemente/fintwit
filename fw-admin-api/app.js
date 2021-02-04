@@ -213,7 +213,7 @@ function getInsightParams(params) {
     let cond = "";
 
     if (!isEmpty(params.date)) {
-        cond = cond.concat(" AND date = '" + params.date + "'");
+        cond = cond.concat(" AND date(date) = '" + params.date + "'");
     }
      if (!isEmpty(params.tUserName)) {
         cond = cond.concat(" AND tUserName = '" + params.tUserName + "'");
