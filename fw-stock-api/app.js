@@ -15,7 +15,7 @@ var userid;
 var resp = new Object();
 var timedata = new Object();
 
-var price = {
+var timeseries = {
     '5m': [],
     '30m': [],
     'Daily': [],
@@ -68,25 +68,25 @@ exports.handler = async (event, context) => {
                                     } else if (!isEmpty(params) && !isEmpty(params.ticker)) {     
                                         var result = await getStockMaster(params.ticker);
                                         resp = result[0];
-                                        resp["Portfolio"] = await getPortfolio(params.ticker);                                        
+                                        resp["Holding"] = await getPortfolio(params.ticker);                                        
                                         resp["Sentiment"] = await getSentiment(params.ticker);
                                         resp["Trending"] = await getTrending(params.ticker);
                                         resp["Tweet"] = await getTweet(params.ticker);
                                         resp["Mention"] = await getMention(params.ticker);
 
                                         timedata = await getTimeSeries('5m', params.ticker);
-                                        price['5m'] = timedata;
+                                        timeseries['5m'] = timedata;
 
                                         timedata = await getTimeSeries('30m', params.ticker);
-                                        price['30m'] = timedata;
+                                        timeseries['30m'] = timedata;
 
                                         timedata = await getTimeSeries('Daily', params.ticker);
-                                        price['Daily'] = timedata;
+                                        timeseries['Daily'] = timedata;
 
                                         timedata = await getTimeSeries('Weekly', params.ticker);
-                                        price['Weekly'] = timedata;
+                                        timeseries['Weekly'] = timedata;
 
-                                        resp["Price"] = price;
+                                        resp["Timeseries"] = timeseries;
                                         
                                     } else  {
                                         resp = await getStockList();
