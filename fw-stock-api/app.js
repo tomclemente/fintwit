@@ -269,21 +269,21 @@ function getStockMaster(ticker) {
 }
 
 function getHolding(ticker) {
-    sql = "SELECT ticker,date,coverage,reach FROM StockChart\
+    sql = "SELECT ticker,date,holding FROM StockChart\
             WHERE category = 'Portfolio' \
             AND ticker = '" + ticker + "' LIMIT 60";
     return executeQuery(sql);
 }
 
 function getSentiment(ticker) {
-    sql = "SELECT ticker,date,bullish,bearish,neutral,sScore FROM StockChart\
+    sql = "SELECT ticker,date,sScore FROM StockChart\
             WHERE category = 'Trending' \
             AND ticker = '" + ticker + "' LIMIT 60";
     return executeQuery(sql);
 }
 
 function getTrending(ticker) {
-    sql = "SELECT ticker,date,coverage,reach,trendingScore FROM StockChart\
+    sql = "SELECT ticker,date,trendingScore FROM StockChart\
             WHERE category = 'Trending' \
             AND ticker = '" + ticker + "' LIMIT 60";
     return executeQuery(sql);
