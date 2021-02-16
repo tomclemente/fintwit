@@ -74,6 +74,7 @@ exports.handler = async (event, context) => {
                                         resp["Holding"] = await getHolding(params.ticker);                                        
                                         resp["Sentiment"] = await getSentiment(params.ticker);
                                         resp["Trending"] = await getTrending(params.ticker);
+                                        resp["Mention"] = await getMention(params.ticker);
                                         resp["Tweets"] = await getTweet(params.ticker);
                                         resp["Investors"] = await getInvestors(params.ticker);
                                         resp["Influencers"] = await getInfluencers(params.ticker);
@@ -268,23 +269,31 @@ function getStockMaster(ticker) {
 }
 
 function getHolding(ticker) {
-    sql = "SELECT sc.ticker,sc.date,sc.coverage,sc.reach FROM StockChart sc\
-            WHERE sc.category = 'Portfolio' \
-            AND sc.ticker = '" + ticker + "' LIMIT 60";
+    sql = "SELECT ticker,date,coverage,reach FROM StockChart\
+            WHERE category = 'Portfolio' \
+            AND ticker = '" + ticker + "' LIMIT 60";
     return executeQuery(sql);
 }
 
 function getSentiment(ticker) {
-    sql = "SELECT sc.ticker,sc.date,sc.bullish,sc.bearish,sc.neutral,sc.sScore FROM StockChart sc\
-            WHERE sc.category = 'Trending' \
-            AND sc.ticker = '" + ticker + "' LIMIT 60";
+    sql = "SELECT ticker,date,bullish,bearish,neutral,sScore FROM StockChart\
+            WHERE category = 'Trending' \
+            AND ticker = '" + ticker + "' LIMIT 60";
     return executeQuery(sql);
 }
 
 function getTrending(ticker) {
-    sql = "SELECT sc.ticker,sc.date,sc.coverage,sc.reach,sc.trendingScore FROM StockChart sc\
-            WHERE sc.category = 'Trending' \
-            AND sc.ticker = '" + ticker + "' LIMIT 60";
+    sql = "SELECT ticker,date,coverage,reach,trendingScore FROM StockChart\
+            WHERE category = 'Trending' \
+            AND ticker = '" + ticker + "' LIMIT 60";
+    return executeQuery(sql);
+}
+
+function getMention(ticker) {
+
+    sql = "SELECT date,SUM(count)\
+            FROM Conversation_Master\
+            WHERE granularity = 'daily' AND ticker = '" + ticker + "' GROUP BY date";
     return executeQuery(sql);
 }
 
