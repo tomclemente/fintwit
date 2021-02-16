@@ -270,25 +270,32 @@ function getStockMaster(ticker) {
 function getHolding(ticker) {
     sql = "SELECT sc.ticker,sc.date,sc.coverage,sc.reach FROM StockChart sc\
             WHERE sc.category = 'Portfolio' \
-            AND sc.ticker = '" + ticker + "' ";
+            AND sc.ticker = '" + ticker + "' LIMIT 60";
     return executeQuery(sql);
 }
 
 function getSentiment(ticker) {
     sql = "SELECT sc.ticker,sc.date,sc.bullish,sc.bearish,sc.neutral,sc.sScore FROM StockChart sc\
             WHERE sc.category = 'Trending' \
-            AND sc.ticker = '" + ticker + "' ";
+            AND sc.ticker = '" + ticker + "' LIMIT 60";
+    return executeQuery(sql);
+}
+
+function getTrending(ticker) {
+    sql = "SELECT sc.ticker,sc.date,sc.coverage,sc.reach,sc.trendingScore FROM StockChart sc\
+            WHERE sc.category = 'Trending' \
+            AND sc.ticker = '" + ticker + "' LIMIT 60";
     return executeQuery(sql);
 }
 
 function getTweet(ticker) {
-    sql = "SELECT i.tweetID from Insight i\
-            INNER JOIN Analyst a on i.tUserID = a.tUserID \
-            INNER JOIN Stock_Master sm on sm.ticker = i.ticker \
-            WHERE sm.isActive != 'N' \
-            AND i.ticker = '" + ticker + "' \
-            ORDER BY a.followerCount DESC \
-            LIMIT 50";
+
+    sql = "SELECT c.date,c.tUserName,a.name,a.profilePicMini,c.tweet,CONCAT('https://twitter.com/',a.name,'/status/',c.tweetID) as 'tweetLink'\
+            FROM Conversation c \
+            INNER JOIN Analyst a on c.tUserID = a.tUserID\
+            WHERE c.ticker = '" + ticker + "' \
+            ORDER BY c.date DESC \
+            LIMIT 100";
     return executeQuery(sql);
 }
 
@@ -303,13 +310,14 @@ function getNews(ticker) {
 
 
 function getInfluencers(ticker) {
-    sql = "SELECT a.tUserName,a.name,a.profilePicMini,p.dateAdded from Portfolio_Master p\
-            INNER JOIN Analyst a on p.tUserID = a.tUserID \
-            INNER JOIN Stock_Master sm on sm.ticker = p.ticker \
-            WHERE sm.isActive != 'N' \
-            AND p.ticker = '" + ticker + "' \
-            ORDER BY a.followerCount DESC \
-            LIMIT 50";
+
+    sql = "SELECT c.tUserName,a.name,a.description,a.profilePicMini, (SUM(c.count)*100/(Select SUM(cm.count) from Conversation_Master cm where cm.granularity = 'daily' and cm.ticker = 'TSLA')) as 'Perc'\
+           FROM Conversation_Master c \
+           INNER JOIN Analyst a on c.tUserID = a.tUserID \
+           WHERE c.granularity = 'daily' and c.ticker = '" + ticker + "' \
+           GROUP BY c.tUserName \
+           ORDER BY Perc desc \
+           LIMIT 50";
 
     return executeQuery(sql);
 }
@@ -324,12 +332,7 @@ function getInvestors(ticker) {
     return executeQuery(sql);
 }
 
-function getTrending(ticker) {
-    sql = "SELECT sc.ticker,sc.date,sc.coverage,sc.reach,sc.trendingScore FROM StockChart sc\
-            WHERE sc.category = 'Trending' \
-            AND sc.ticker = '" + ticker + "' ";
-    return executeQuery(sql);
-}
+
 
 
 function getTimeSeries(granularity, ticker) {
