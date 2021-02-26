@@ -184,19 +184,19 @@ function getAnalystStocks(username) {
    sql = "(SELECT s.coverage,s.reach,s.bullish,s.bearish,s.neutral,s.category,s.trendingScore, s.trendingScoreChange, s.sScore, s.sScoreChange,s.holding,s.holdingChange,s.holdingChangePerc,sm.*,CASE WHEN w.ticker IS NULL THEN false ELSE true END AS watchlist \
             FROM Stock s \
             INNER JOIN Stock_Master sm on s.ticker = sm.ticker AND s.category = 'Portfolio' \
-            INNER OUTER JOIN Watchlist w on s.ticker = w.ticker AND w.username = '" + userid + "'\
+            INNER JOIN Watchlist w on s.ticker = w.ticker AND w.username = '" + userid + "'\
             where sm.isActive != 'N'\
             order by s.holding desc limit 200) UNION ALL \
            (SELECT s.coverage,s.reach,s.bullish,s.bearish,s.neutral,s.category,s.trendingScore, s.trendingScoreChange, s.sScore, s.sScoreChange,s.holding,s.holdingChange,s.holdingChangePerc,sm.*,CASE WHEN w.ticker IS NULL THEN false ELSE true END AS watchlist \
             FROM Stock s  \
             INNER JOIN Stock_Master sm on s.ticker = sm.ticker and s.category = 'Trending' \
-            INNER OUTER JOIN Watchlist w on s.ticker = w.ticker AND w.username = '" + userid + "'\
+            INNER JOIN Watchlist w on s.ticker = w.ticker AND w.username = '" + userid + "'\
             where sm.isActive != 'N'\
             order by s.trendingScore desc limit 200) UNION ALL \
            (SELECT s.coverage,s.reach,s.bullish,s.bearish,s.neutral,'Sentiment' AS 'category',s.trendingScore, s.trendingScoreChange, s.sScore, s.sScoreChange,s.holding,s.holdingChange,s.holdingChangePerc,sm.*,CASE WHEN w.ticker IS NULL THEN false ELSE true END AS watchlist \
             FROM Stock s  \
             INNER JOIN Stock_Master sm on s.ticker = sm.ticker and s.category = 'Trending' \
-            INNER OUTER JOIN Watchlist w on s.ticker = w.ticker AND w.username = '" + userid + "'\
+            INNER JOIN Watchlist w on s.ticker = w.ticker AND w.username = '" + userid + "'\
             where sm.isActive != 'N'\
             order by s.sScore desc limit 200)"
 
@@ -210,19 +210,19 @@ function getWatchList(username) {
    sql = "(SELECT s.coverage,s.reach,s.bullish,s.bearish,s.neutral,s.category,s.trendingScore, s.trendingScoreChange, s.sScore, s.sScoreChange,s.holding,s.holdingChange,s.holdingChangePerc,sm.*,CASE WHEN w.ticker IS NULL THEN false ELSE true END AS watchlist \
             FROM Stock s \
             INNER JOIN Stock_Master sm on s.ticker = sm.ticker AND s.category = 'Portfolio' \
-            INNER OUTER JOIN Watchlist w on s.ticker = w.ticker AND w.username = '" + userid + "'\
+            INNER JOIN Watchlist w on s.ticker = w.ticker AND w.username = '" + userid + "'\
             where sm.isActive != 'N'\
             order by s.holding desc limit 200) UNION ALL \
            (SELECT s.coverage,s.reach,s.bullish,s.bearish,s.neutral,s.category,s.trendingScore, s.trendingScoreChange, s.sScore, s.sScoreChange,s.holding,s.holdingChange,s.holdingChangePerc,sm.*,CASE WHEN w.ticker IS NULL THEN false ELSE true END AS watchlist \
             FROM Stock s  \
             INNER JOIN Stock_Master sm on s.ticker = sm.ticker and s.category = 'Trending' \
-            INNER OUTER JOIN Watchlist w on s.ticker = w.ticker AND w.username = '" + userid + "'\
+            INNER JOIN Watchlist w on s.ticker = w.ticker AND w.username = '" + userid + "'\
             where sm.isActive != 'N'\
             order by s.trendingScore desc limit 200) UNION ALL \
            (SELECT s.coverage,s.reach,s.bullish,s.bearish,s.neutral,'Sentiment' AS 'category',s.trendingScore, s.trendingScoreChange, s.sScore, s.sScoreChange,s.holding,s.holdingChange,s.holdingChangePerc,sm.*,CASE WHEN w.ticker IS NULL THEN false ELSE true END AS watchlist \
             FROM Stock s  \
             INNER JOIN Stock_Master sm on s.ticker = sm.ticker and s.category = 'Trending' \
-            INNER OUTER JOIN Watchlist w on s.ticker = w.ticker AND w.username = '" + userid + "'\
+            INNER JOIN Watchlist w on s.ticker = w.ticker AND w.username = '" + userid + "'\
             where sm.isActive != 'N'\
             order by s.sScore desc limit 200)"
 
