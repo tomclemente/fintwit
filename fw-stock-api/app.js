@@ -170,7 +170,7 @@ function executeQuery(sql) {
 };
 
 function getUser3DCardInfo() {
-    sql = "SELECT clientSecretKey, actionRequired FROM User WHERE username = '" + userid + "'";
+    sql = "SELECT clientSecretKey, CASE WHEN actionRequired = 1 THEN "true" ELSE "false" END AS actionRequired FROM User WHERE username = '" + userid + "'";
     return executeQuery(sql);
 }
 
