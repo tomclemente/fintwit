@@ -55,8 +55,9 @@ exports.handler = async (event, context) => {
                     case 'POST':      
                         getUser().then(async function(data) {
                             if (!isEmpty(data)) {
+                                resp = new Object();
+
                                 if  (data[0].subscriptionStatus == 'ACTIVE' || data[0].subscriptionStatus == 'TRIALING' || data[0].subscriptionStatus == 'MANUALLY_CANCELLED'){
-                                    resp = new Object();
                                     
                                     if (!isEmpty(params) && params.watchlist == 'Y') {
                                         resp = await getWatchList(data[0].username);
@@ -99,11 +100,14 @@ exports.handler = async (event, context) => {
                                         resp = await getStockList();
                                     }
                                 
+                                } else if (data[0].subscriptionStatus == 'INCOMPLETE' || data[0].subscriptionStatus == 'PAYMENT_FAILED') {
+                                    resp = await getUser3DCardInfo();
+
                                 } else {
                                     throw new Error("Not authorized");
                                 }
                             } else {
-                                throw new Error("User not found found. Unable to perform operation");
+                                throw new Error("User not found");
                             }       
 
                         }, reject).then(function() {
@@ -164,6 +168,11 @@ function executeQuery(sql) {
         });
     });
 };
+
+function getUser3DCardInfo() {
+    sql = "SELECT clientSecretKey, actionRequired FROM User WHERE username = '" + userid + "'";
+    return executeQuery(sql);
+}
 
 function getUser() {
     sql = "SELECT * FROM User WHERE username = '" + userid + "'";
