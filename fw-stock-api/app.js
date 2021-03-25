@@ -321,10 +321,10 @@ function getNews(ticker) {
 
 function getInfluencers(ticker) {
 
-    sql = "SELECT c.tUserName,a.name,a.description,a.profilePicMini, CONCAT('https://twitter.com/',c.tUserName) as 'twitterID' (SUM(c.count)*100/(Select SUM(cm.count) from Conversation_Master cm where cm.granularity = 'daily' and cm.ticker = '" + ticker + "')) as 'Perc'\
+    sql = "SELECT c.tUserName,a.name,a.description,a.profilePicMini, CONCAT('https://twitter.com/',c.tUserName) as 'twitterID', (SUM(c.count)*100/(Select SUM(cm.count) from Conversation_Master cm where cm.granularity = 'daily' and cm.ticker = '" + ticker + "')) as 'Perc'\
            FROM Conversation_Master c \
            INNER JOIN Analyst a on c.tUserID = a.tUserID \
-           WHERE c.granularity = 'daily' and c.ticker = '" + ticker + "' \
+           WHERE c.granularity = 'daily' and c.ticker = '" + ticker + "'\
            GROUP BY c.tUserName \
            ORDER BY Perc desc \
            LIMIT 50";
