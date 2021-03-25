@@ -478,14 +478,14 @@ function generateThankYouEmail() {
                                             <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px; font-family: Arial, sans-serif"><![endif]-->
                                             <div style="color:#FFFFFF;font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;line-height:1.5;padding-top:10px;padding-right:10px;padding-bottom:10px;padding-left:10px;">
                                                 <div style="line-height: 1.5; font-size: 12px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #FFFFFF; mso-line-height-alt: 18px;">
-                                                    <p style="line-height: 1.5; word-break: break-word; text-align: center; font-family: Helvetica; font-size: 15px; mso-line-height-alt: 23px; margin: 0;"><span style="font-size: 14px;">We analyze relevant tweets from prominent influencers within the Fintwit community and surface the most relevant and trending stocks in real time.</span></p>
+                                                    <p style="line-height: 1.5; word-break: break-word; text-align: center; font-family: Helvetica; font-size: 15px; mso-line-height-alt: 23px; margin: 0;"><span style="font-size: 14px;">We analyze thousands of tweets in real time from prominent influencers within the Fintwit community and surface trending tickers, investment sentiments and trading signals.</span></p>
                                                 </div>
                                             </div>
 
                                             <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px; font-family: Arial, sans-serif"><![endif]-->
                                             <div style="color:#FFFFFF;font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;line-height:1.5;padding-top:10px;padding-right:10px;padding-bottom:10px;padding-left:10px;">
                                                 <div style="line-height: 1.5; font-size: 12px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #FFFFFF; mso-line-height-alt: 18px;">
-                                                    <p style="line-height: 1.5; word-break: break-word; text-align: center; font-family: Helvetica; font-size: 15px; mso-line-height-alt: 23px; margin: 0;"><span style="font-size: 14px;">Our real time processing engine processes hundreds of thousands of tweets and intelligently analyzes each tweet to predict trading signals and investment sentiments.</span></p>
+                                                    <p style="line-height: 1.5; word-break: break-word; text-align: center; font-family: Helvetica; font-size: 15px; mso-line-height-alt: 23px; margin: 0;"><span style="font-size: 14px;">We cover over 6000 stocks from all major US exchanges.</span></p>
                                                 </div>
                                             </div>
 
