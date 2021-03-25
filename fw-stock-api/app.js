@@ -75,7 +75,6 @@ exports.handler = async (event, context) => {
                                         resp["Holding"] = await getHolding(params.ticker);                                        
                                         resp["Sentiment"] = await getSentiment(params.ticker);
                                         resp["Trending"] = await getTrending(params.ticker);
-                                        resp["Mention"] = await getMention(params.ticker);
                                         resp["Tweets"] = await getTweet(params.ticker);
                                         resp["Investors"] = await getInvestors(params.ticker);
                                         resp["Influencers"] = await getInfluencers(params.ticker);
@@ -298,13 +297,6 @@ function getTrending(ticker) {
     return executeQuery(sql);
 }
 
-function getMention(ticker) {
-
-    sql = "SELECT date,SUM(count)\
-            FROM Conversation_Master\
-            WHERE granularity = 'daily' AND ticker = '" + ticker + "' GROUP BY date";
-    return executeQuery(sql);
-}
 
 function getTweet(ticker) {
 
@@ -329,7 +321,7 @@ function getNews(ticker) {
 
 function getInfluencers(ticker) {
 
-    sql = "SELECT c.tUserName,a.name,a.description,a.profilePicMini, (SUM(c.count)*100/(Select SUM(cm.count) from Conversation_Master cm where cm.granularity = 'daily' and cm.ticker = 'TSLA')) as 'Perc'\
+    sql = "SELECT c.tUserName,a.name,a.description,a.profilePicMini, (SUM(c.count)*100/(Select SUM(cm.count) from Conversation_Master cm where cm.granularity = 'daily' and cm.ticker = '" + ticker + "')) as 'Perc'\
            FROM Conversation_Master c \
            INNER JOIN Analyst a on c.tUserID = a.tUserID \
            WHERE c.granularity = 'daily' and c.ticker = '" + ticker + "' \
