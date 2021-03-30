@@ -44,17 +44,17 @@ exports.handler = async (event, context) => {
             switch (event.httpMethod) {
 
                 case 'GET':
-                    getWatchlist().then(function(data) {
+                    getStock().then(function(data) {
                         resolve(data);
                     }, reject);
 
                 break;
 
                 case 'POST':      
-                    return insertWatchlist(params.ticker).then(resolve, reject);
+                    return insertStock(params.ticker, params.category).then(resolve, reject);
 
                 case 'DELETE':
-                    return deleteWatchlist(params.ticker).then(resolve, reject);
+                    return deleteStock(params.ticker).then(resolve, reject);
 
                 default:
                     throw new Error(`Unsupported method "${event.httpMethod}"`);
@@ -131,24 +131,25 @@ function executePostQuery(sql, post) {
     });
 };
 
-function insertWatchlist(ticker) {
+function insertStock(value, category) {
     var post = {
         username: userid, 
-        ticker: ticker, 
+        value: ticker, 
+        category: category,
     };
 
     sql = "INSERT INTO Watchlist SET ?";
     return executePostQuery(sql, post);   
 }
 
-function getWatchlist() {
+function getStock() {
     sql = "SELECT * FROM Watchlist WHERE username = '" + userid + "'";
     return executeQuery(sql);
 }
 
-function deleteWatchlist(ticker) {
+function deleteStock(ticker) {
     sql = "DELETE FROM Watchlist \
             WHERE username = '" + userid + "' \
-            AND ticker = '" + ticker + "' ";
+            AND value = '" + ticker + "' ";
     return executeQuery(sql);
 }
