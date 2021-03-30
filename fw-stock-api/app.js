@@ -265,31 +265,31 @@ function getWatchList(username) {
 }
 //comment
 function getStockList() {
-    sql = "(SELECT s.coverage,s.reach,s.bullish,s.bearish,s.neutral,s.category,s.trendingScore, s.trendingScoreChange, s.sScore, s.sScoreChange,s.holding,s.holdingChange,s.holdingChangePerc,sm.*,CASE WHEN w.category != 'Watchlist' THEN false ELSE true END AS watchlist,CASE WHEN w.category != 'Portfolio' THEN false ELSE true END AS portfolio \
+    sql = "(SELECT s.coverage,s.reach,s.bullish,s.bearish,s.neutral,s.category,s.trendingScore, s.trendingScoreChange, s.sScore, s.sScoreChange,s.holding,s.holdingChange,s.holdingChangePerc,sm.*,CASE WHEN w.category = 'Watchlist' THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio \
             FROM Stock s \
             INNER JOIN Stock_Master sm on s.ticker = sm.ticker AND s.category = 'Portfolio' \
             LEFT OUTER JOIN Watchlist w on s.ticker = w.value AND w.username = '" + userid + "'\
             where sm.isActive != 'N'\
             order by s.holding desc limit 200) UNION ALL \
-            (SELECT s.coverage,s.reach,s.bullish,s.bearish,s.neutral,'Top Traded' AS 'category',s.trendingScore, s.trendingScoreChange, s.sScore, s.sScoreChange,s.holding,s.holdingChange,s.holdingChangePerc,sm.*,CASE WHEN w.category != 'Watchlist'  THEN false ELSE true END AS watchlist,CASE WHEN w.category != 'Portfolio' THEN false ELSE true END AS portfolio  \
+            (SELECT s.coverage,s.reach,s.bullish,s.bearish,s.neutral,'Top Traded' AS 'category',s.trendingScore, s.trendingScoreChange, s.sScore, s.sScoreChange,s.holding,s.holdingChange,s.holdingChangePerc,sm.*,CASE WHEN w.category = 'Watchlist'  THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio  \
             FROM Stock s \
             INNER JOIN Stock_Master sm on s.ticker = sm.ticker AND s.category = 'Portfolio' \
             LEFT OUTER JOIN Watchlist w on s.ticker = w.value AND w.username = '" + userid + "'\
             where sm.isActive != 'N'\
             order by s.holdingChange desc limit 200) UNION ALL \
-           (SELECT s.coverage,s.reach,s.bullish,s.bearish,s.neutral,s.category,s.trendingScore, s.trendingScoreChange, s.sScore, s.sScoreChange,s.holding,s.holdingChange,s.holdingChangePerc,sm.*,CASE WHEN w.category != 'Watchlist' THEN false ELSE true END AS watchlist,CASE WHEN w.category != 'Portfolio' THEN false ELSE true END AS portfolio  \
+           (SELECT s.coverage,s.reach,s.bullish,s.bearish,s.neutral,s.category,s.trendingScore, s.trendingScoreChange, s.sScore, s.sScoreChange,s.holding,s.holdingChange,s.holdingChangePerc,sm.*,CASE WHEN w.category = 'Watchlist' THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio  \
             FROM Stock s  \
             INNER JOIN Stock_Master sm on s.ticker = sm.ticker and s.category = 'Trending' \
             LEFT OUTER JOIN Watchlist w on s.ticker = w.value AND w.username = '" + userid + "'\
             where sm.isActive != 'N'\
             order by s.trendingScore desc limit 200) UNION ALL \
-           (SELECT s.coverage,s.reach,s.bullish,s.bearish,s.neutral,'Positive' AS 'category',s.trendingScore, s.trendingScoreChange, s.sScore, s.sScoreChange,s.holding,s.holdingChange,s.holdingChangePerc,sm.*,CASE WHEN w.category != 'Watchlist' THEN false ELSE true END AS watchlist,CASE WHEN w.category != 'Portfolio' THEN false ELSE true END AS portfolio  \
+           (SELECT s.coverage,s.reach,s.bullish,s.bearish,s.neutral,'Positive' AS 'category',s.trendingScore, s.trendingScoreChange, s.sScore, s.sScoreChange,s.holding,s.holdingChange,s.holdingChangePerc,sm.*,CASE WHEN w.category = 'Watchlist' THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio  \
             FROM Stock s  \
             INNER JOIN Stock_Master sm on s.ticker = sm.ticker and s.category = 'Trending' \
             LEFT OUTER JOIN Watchlist w on s.ticker = w.value AND w.username = '" + userid + "'\
             where sm.isActive != 'N' and s.sScore > 0 and s.sScore <= 1\
             order by s.sScore desc limit 100) UNION ALL \
-            (SELECT s.coverage,s.reach,s.bullish,s.bearish,s.neutral,'Negative' AS 'category',s.trendingScore, s.trendingScoreChange, s.sScore, s.sScoreChange,s.holding,s.holdingChange,s.holdingChangePerc,sm.*,CASE WHEN w.category != 'Watchlist' THEN false ELSE true END AS watchlist,CASE WHEN w.category != 'Portfolio' THEN false ELSE true END AS portfolio  \
+            (SELECT s.coverage,s.reach,s.bullish,s.bearish,s.neutral,'Negative' AS 'category',s.trendingScore, s.trendingScoreChange, s.sScore, s.sScoreChange,s.holding,s.holdingChange,s.holdingChangePerc,sm.*,CASE WHEN w.category = 'Watchlist' THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio  \
             FROM Stock s  \
             INNER JOIN Stock_Master sm on s.ticker = sm.ticker and s.category = 'Trending' \
             LEFT OUTER JOIN Watchlist w on s.ticker = w.value AND w.username = '" + userid + "'\
@@ -306,7 +306,7 @@ function getTicker(params) {
 }
 
 function getStockMaster(ticker) {
-    sql = "SELECT sm.*, CASE WHEN w.category != 'Watchlist' THEN false ELSE true END AS watchlist,CASE WHEN w.category != 'Portfolio' THEN false ELSE true END AS portfolio \
+    sql = "SELECT sm.*, CASE WHEN w.category = 'Watchlist' THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio \
             FROM Stock_Master sm \
             LEFT OUTER JOIN Watchlist w on sm.ticker = w.value AND w.username = '" + userid + "'\
             WHERE sm.isActive != 'N' and sm.ticker = '" + ticker + "' ";
