@@ -51,10 +51,10 @@ exports.handler = async (event, context) => {
                 break;
 
                 case 'POST':      
-                    return insertStock(params.ticker, params.category).then(resolve, reject);
+                    return insertStock(params.value, params.category).then(resolve, reject);
 
                 case 'DELETE':
-                    return deleteStock(params.ticker).then(resolve, reject);
+                    return deleteStock(params.value).then(resolve, reject);
 
                 default:
                     throw new Error(`Unsupported method "${event.httpMethod}"`);
@@ -147,9 +147,9 @@ function getStock() {
     return executeQuery(sql);
 }
 
-function deleteStock(ticker) {
+function deleteStock(value) {
     sql = "DELETE FROM Watchlist \
             WHERE username = '" + userid + "' \
-            AND value = '" + ticker + "' ";
+            AND value = '" + value + "' ";
     return executeQuery(sql);
 }
