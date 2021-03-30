@@ -134,7 +134,7 @@ function executePostQuery(sql, post) {
 function insertStock(value, category) {
     var post = {
         username: userid, 
-        value: ticker, 
+        value: value, 
         category: category,
     };
 
