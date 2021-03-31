@@ -60,10 +60,12 @@ exports.handler = async (event, context) => {
                                 if  (data[0].subscriptionStatus == 'ACTIVE' || data[0].subscriptionStatus == 'TRIALING' || data[0].subscriptionStatus == 'MANUALLY_CANCELLED'){
                                     
                                     if (!isEmpty(params) && params.watchlist == 'Y') {
-                                        resp = await getWatchList(data[0].username);
+                                        resp["list"] = await getWatchList(data[0].username);
+                                        resp["mentions"] = await getWatchMentions();
 
                                     } else if (!isEmpty(params) && params.portfolio == 'Y') {
-                                        resp = await getPortfolioStocks(data[0].username);
+                                        resp["list"] = await getPortfolioStocks(data[0].username);
+                                        resp["mentions"] = await getPortfolioMentions();
 
                                     }else if (!isEmpty(params) && !isEmpty(params.search)) {
                                         resp = await getSearchList(params.search);
@@ -96,7 +98,8 @@ exports.handler = async (event, context) => {
                                         resp["Timeseries"] = timeseries;
                                         
                                     } else  {
-                                        resp = await getStockList();
+                                        resp["list"] = await getStockList();   
+                                        resp["mentions"] = await getStockMentions();
                                     }
                                 
                                 } else if (data[0].subscriptionStatus == 'INCOMPLETE' || data[0].subscriptionStatus == 'PAYMENT_FAILED') {
@@ -389,5 +392,45 @@ function getTimeSeries(granularity, ticker) {
             WHERE sm.isActive != 'N' \
             AND t.granularity = '"+ granularity + "' \
             AND t.ticker = '" + ticker + "'";
+    return executeQuery(sql);
+}
+
+
+function getStockMentions() {
+    sql = "SELECT 'Top Mentions' as Category, c.ticker, SUM(c.count) as mentions, \
+            CASE WHEN w.category = 'Watchlist' THEN \
+            true ELSE false END AS watchlist, \
+            CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio \
+            FROM Conversation_Master c \
+            LEFT OUTER JOIN Watchlist w on c.ticker = w.value AND w.username = '" + userid + "' \
+            WHERE c.granularity = 'daily' and c.date > CURDATE() - 7 \
+            GROUP BY c.ticker  \
+            ORDER BY mentions desc \
+            LIMIT 50";
+    return executeQuery(sql);
+}
+
+
+function getWatchMentions() {
+    sql = "SELECT 'Top Mentions' as Category, c.ticker, SUM(c.count) as mentions, \
+            CASE WHEN w.value IS NULL THEN false ELSE true END AS watchlist, false as portfolio \
+            FROM Conversation_Master c \
+            INNER JOIN Watchlist w on c.ticker = w.value AND w.category = 'Watchlist'  AND w.username = '" + userid + "' \
+            WHERE c.granularity = 'daily' and c.date > CURDATE() - 7 \
+            GROUP BY c.ticker \
+            ORDER BY mentions desc \
+            LIMIT 50";
+    return executeQuery(sql);
+}
+
+function getPortfolioMentions() {
+    sql = "SELECT 'Top Mentions' as Category, c.ticker, SUM(c.count) as mentions, \
+            CASE WHEN w.value IS NULL THEN false ELSE true END AS portfolio, false as watchlist \
+            FROM Conversation_Master c \
+            INNER JOIN Watchlist w on c.ticker = w.value AND w.category = 'Portfolio'  AND w.username = '" + userid + "' \
+            WHERE c.granularity = 'daily' and c.date > CURDATE() - 7 \
+            GROUP BY c.ticker \
+            ORDER BY mentions desc \
+            LIMIT 50";
     return executeQuery(sql);
 }
