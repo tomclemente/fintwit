@@ -138,7 +138,7 @@ function insertStock(value, category) {
         category: category,
     };
 
-    sql = "INSERT INTO Watchlist SET ?";
+    sql = "REPLACE INTO Watchlist SET ?";
     return executePostQuery(sql, post);   
 }
 
