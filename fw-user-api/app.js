@@ -125,7 +125,7 @@ exports.handler = async (event, context) => {
 
                         getUser().then(async function(data) {                         
                             if (!isEmpty(data)) {
-                                resp = deleteUser(data[0].username);                            
+                                resp = await deleteUser(data[0].username);                            
                                 await deleteCognitoUser();
                                 await sendEmail(generateGoodbyeEmail());
                                 await deleteWatchlist(data[0].username);
