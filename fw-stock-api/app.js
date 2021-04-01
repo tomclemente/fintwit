@@ -59,22 +59,21 @@ exports.handler = async (event, context) => {
 
                                 if  (data[0].subscriptionStatus == 'ACTIVE' || data[0].subscriptionStatus == 'TRIALING' || data[0].subscriptionStatus == 'MANUALLY_CANCELLED'){
                                     
-                                    if (!isEmpty(params) && params.watchlist == 'Y') {
-                                        resp["list"] = await getWatchList(data[0].username);
-                                        resp["mentions"] = await getWatchMentions();
+                                    if (!isEmpty(params) && params.watchlist == 'Y' && params.portfolio == 'Y' ) {
+                                        resp["list"] = await getPWStocks(data[0].username);
+                                        resp["mentions"] = await getPWMentions();
 
                                     } else if (!isEmpty(params) && params.portfolio == 'Y') {
                                         resp["list"] = await getPortfolioStocks(data[0].username);
                                         resp["mentions"] = await getPortfolioMentions();
 
-                                    } else if (!isEmpty(params) && params.watchlist == 'Y' && params.portfolio == 'Y' ) {
-                                        resp["list"] = await getPWStocks(data[0].username);
-                                        resp["mentions"] = await getPWMentions();
+                                    } else if (!isEmpty(params) && params.watchlist == 'Y') {
+                                        resp["list"] = await getWatchList(data[0].username);
+                                        resp["mentions"] = await getWatchMentions();
 
                                     }else if (!isEmpty(params) && !isEmpty(params.search)) {
                                         resp = await getSearchList(params.search);
                                     
-
                                     } else if (!isEmpty(params) && !isEmpty(params.ticker)) {     
                                         var result = await getStockMaster(params.ticker);
                                         resp = result[0];
