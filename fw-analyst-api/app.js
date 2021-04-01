@@ -13,14 +13,6 @@ var pool = mysql.createPool({
 var sql;
 var userid;
 var resp = new Object();
-var timedata = new Object();
-
-var timeseries = {
-    '5m': [],
-    '30m': [],
-    'Daily': [],
-    'Weekly': []
-};
 
 exports.handler = async (event, context) => {
 
