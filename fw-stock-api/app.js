@@ -397,40 +397,43 @@ function getTimeSeries(granularity, ticker) {
 
 
 function getStockMentions() {
-    sql = "SELECT 'Top Mentions' as Category, c.ticker, SUM(c.count) as mentions, \
+    sql = "SELECT 'Top Mentions' as Category, c.ticker, sm.marketCap, sm.Price, sm.industry, SUM(c.count) as mentions, \
             CASE WHEN w.category = 'Watchlist' THEN \
             true ELSE false END AS watchlist, \
             CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio \
             FROM Conversation_Master c \
+            INNER JOIN Stock_Master sm on c.ticker = sm.ticker \
             LEFT OUTER JOIN Watchlist w on c.ticker = w.value AND w.username = '" + userid + "' \
-            WHERE c.granularity = 'daily' and c.date > CURDATE() - 7 \
+            WHERE sm.isActive != 'N' AND c.granularity = 'daily' and c.date > CURDATE() - 7 \
             GROUP BY c.ticker  \
             ORDER BY mentions desc \
-            LIMIT 50";
+            LIMIT 200";
     return executeQuery(sql);
 }
 
 
 function getWatchMentions() {
-    sql = "SELECT 'Top Mentions' as Category, c.ticker, SUM(c.count) as mentions, \
+    sql = "SELECT 'Top Mentions' as Category, c.ticker, sm.marketCap, sm.Price, sm.industry, SUM(c.count) as mentions, \
             CASE WHEN w.value IS NULL THEN false ELSE true END AS watchlist, false as portfolio \
             FROM Conversation_Master c \
+            INNER JOIN Stock_Master sm on c.ticker = sm.ticker \
             INNER JOIN Watchlist w on c.ticker = w.value AND w.category = 'Watchlist'  AND w.username = '" + userid + "' \
-            WHERE c.granularity = 'daily' and c.date > CURDATE() - 7 \
+            WHERE sm.isActive != 'N' AND c.granularity = 'daily' and c.date > CURDATE() - 7 \
             GROUP BY c.ticker \
             ORDER BY mentions desc \
-            LIMIT 50";
+            LIMIT 200";
     return executeQuery(sql);
 }
 
 function getPortfolioMentions() {
-    sql = "SELECT 'Top Mentions' as Category, c.ticker, SUM(c.count) as mentions, \
+    sql = "SELECT 'Top Mentions' as Category, c.ticker, sm.marketCap, sm.Price, sm.industry, SUM(c.count) as mentions, \
             CASE WHEN w.value IS NULL THEN false ELSE true END AS portfolio, false as watchlist \
             FROM Conversation_Master c \
+            INNER JOIN Stock_Master sm on c.ticker = sm.ticker \
             INNER JOIN Watchlist w on c.ticker = w.value AND w.category = 'Portfolio'  AND w.username = '" + userid + "' \
-            WHERE c.granularity = 'daily' and c.date > CURDATE() - 7 \
+            WHERE sm.isActive != 'N' AND c.granularity = 'daily' and c.date > CURDATE() - 7 \
             GROUP BY c.ticker \
             ORDER BY mentions desc \
-            LIMIT 50";
+            LIMIT 200";
     return executeQuery(sql);
 }
