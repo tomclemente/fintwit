@@ -100,7 +100,6 @@ exports.handler = async (event, context) => {
                                 }
                                 
                                 if (!isEmpty(params.plan)) {
-                                    await updateSubscriptionPlan(username, params);
                                     await sendEmail(generatePlanChangeEmail());
                                 }
         
@@ -1490,12 +1489,6 @@ function deactivateSubscription(username) {
     return executeQuery(sql);
 }
 
-function updateSubscriptionPlan(username, params) {
-    sql = "UPDATE User SET plan = '" + params.plan + "' \
-            WHERE username = '" + username + "' ";
-
-    return executeQuery(sql);   
-}
 
 function updateSubscriptionNotification(username, params) {
     sql = "UPDATE User SET notificationFlag = '" + params.notificationFlag + "' \
