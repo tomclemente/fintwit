@@ -485,7 +485,7 @@ function generateThankYouEmail() {
                                             <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px; font-family: Arial, sans-serif"><![endif]-->
                                             <div style="color:#525252;font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;line-height:1.5;padding-top:10px;padding-right:10px;padding-bottom:10px;padding-left:10px;">
                                                 <div style="line-height: 1.5; font-size: 12px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #525252; mso-line-height-alt: 18px;">
-                                                    <p style="line-height: 1.5; word-break: break-word; text-align: center; font-family: Helvetica; font-size: 15px; mso-line-height-alt: 23px; margin: 0;"><span style="font-size: 14px;">Sign up for the <b>Free 7-day Trial Period.</b> You can cancel your subscription anytime.</span></p>
+                                                    <p style="line-height: 1.5; word-break: break-word; text-align: left; font-family: Helvetica; font-size: 15px; mso-line-height-alt: 23px; margin: 0;"><span style="font-size: 14px;">Sign up for the <b>Free 7-day Trial Period.</b> You can cancel your subscription anytime.</span></p>
                                                 </div>
                                             </div>
 
@@ -499,7 +499,7 @@ function generateThankYouEmail() {
                                             <p style="line-height: 1.5; font-family: Helvetica; word-break: break-word; mso-line-height-alt: 18px; margin: 0;">&nbsp;</p>
                                             <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px; font-family: Arial, sans-serif"><![endif]-->
                                             <div style="color:#525252;font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;line-height:1.5;padding-top:10px;padding-right:10px;padding-bottom:10px;padding-left:10px;">
-                                                <div style="line-height: 1.5; font-size: 12px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #FFFFFF; mso-line-height-alt: 15px;">
+                                                <div style="line-height: 1.5; font-size: 12px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #525252; mso-line-height-alt: 15px;">
                                                     <p style="line-height: 1.5; word-break: break-word; text-align: center; font-family: Helvetica; font-size: 14px; mso-line-height-alt: 20px; margin: 0;"><span style="font-size: 12px;"><span style>If you have any questions, please let us know at support@fintwit.ai</span></span></p>
                                                 </div>
                                             </div>
