@@ -69,7 +69,7 @@ exports.handler = async (event, context) => {
                                 await sendEmail(generatePaymentConfirmation(params));
                                 resolve(resp);
                             } else {
-                                throw new Error("User not found found. Unable to perform POST payment operation");
+                                throw new Error("User not found. Unable to perform POST payment operation");
                             }       
                         }).catch(err => {
                             reject({ statusCode: 500, body: err.message });
@@ -344,7 +344,7 @@ function generatePaymentConfirmation(params) {
                         </style>
                     </head>
                     
-                    <body class="clean-body" style="margin: 0; padding: 0; -webkit-text-size-adjust: 100%; background-color: background: #000000;">
+                    <body class="clean-body" style="margin: 0; padding: 0; -webkit-text-size-adjust: 100%; background-color: background: #f9f9f9;">
                         <!--[if IE]><div class="ie-browser"><![endif]-->
                         <table class="nl-container" style="table-layout: fixed; vertical-align: top; min-width: 320px; border-spacing: 0; border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: #f9f9f9; width: 100%;" cellpadding="0" cellspacing="0" role="presentation" width="100%" bgcolor="#f9f9f9" valign="top">
                             <tbody>
@@ -388,7 +388,7 @@ function generatePaymentConfirmation(params) {
                                         </div>
                                         <div style="background-color:transparent;">
                                             <div class="block-grid " style="min-width: 320px; max-width: 600px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; Margin: 0 auto; background-color: #ffffff;">
-                                                <div style="border-collapse: collapse;display: table;width: 100%;background-color:#001B3A;">
+                                                <div style="border-collapse: collapse;display: table;width: 100%;background-color:#ffffff;">
                                                     <!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:transparent;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:600px"><tr class="layout-full-width" style="background-color:#ffffff"><![endif]-->
                                                     <!--[if (mso)|(IE)]><td align="center" width="600" style="background-color:#ffffff;width:600px; border-top: none; border-left: none; border-bottom: none; border-right: none;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr bgcolor='#F9F9F9'><td colspan='3' style='font-size:7px;line-height:10px'>&nbsp;</td></tr><tr><td style='padding-top:20px;padding-bottom:20px' width='10' bgcolor='#F9F9F9'><table role='presentation' width='10' cellpadding='0' cellspacing='0' border='0'><tr><td>&nbsp;</td></tr></table></td><td style="padding-right: 25px; padding-left: 25px; padding-top:20px; padding-bottom:20px;"><![endif]-->
                                                     <div class="col num12" style="min-width: 320px; max-width: 600px; display: table-cell; vertical-align: top; width: 580px;">
@@ -399,7 +399,7 @@ function generatePaymentConfirmation(params) {
                                                                 <div class="img-container center fixedwidth" align="center" style="padding-right: 10px;padding-left: 10px;">
                     
                                                                     <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 10px;padding-left: 10px;" align="center"><![endif]-->
-                                                                    <div style="font-size:1px;line-height:10px">&nbsp;</div><img class="center fixedwidth" align="center" border="0" src="https://fintwit-resources.s3.amazonaws.com/fintwit_email_logo.png" alt="Alternate text" title="Alternate text" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 185px; display: block;" width="185">
+                                                                    <div style="font-size:1px;line-height:10px">&nbsp;</div><img class="center fixedwidth" align="center" border="0" src="https://fintwit-resources.s3.amazonaws.com/fintwit_dark_logo.png" alt="Alternate text" title="Alternate text" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 145px; display: block;" width="185">
                                                                     <div style="font-size:1px;line-height:10px">&nbsp;</div>
                                                                     <!--[if mso]></td></tr></table><![endif]-->
                                                                 </div>
