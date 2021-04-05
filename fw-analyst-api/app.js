@@ -51,7 +51,7 @@ exports.handler = async (event, context) => {
 
                         switch(params.method) {
                             case 'search':
-                                if (!isEmpty(term)) {
+                                if (!isEmpty(params.term)) {
                                     resp = await searchAnalyst(params.term);
 
                                 } else {
@@ -67,16 +67,16 @@ exports.handler = async (event, context) => {
                                 } else if (params.ticker == 'ALL_TICKER' && params.analyst == 'FOLLOW_ANALYST') {
                                     resp = await getAllTickerFollowedAnalyst();
     
-                                } else if (params.analyst == 'ALL_ANALYST') {
+                                } else if (params.analyst == 'ALL_ANALYST' && params.ticker != 'PORTFOLIO_TICKER' && params.ticker != 'WATCHLIST_TICKER' ) {
                                     resp = await getTickerAllAnalyst(params.ticker);
     
-                                } else if (params.analyst == 'FOLLOW_ANALYST') {
+                                } else if (params.analyst == 'FOLLOW_ANALYST'  && params.ticker != 'PORTFOLIO_TICKER' && params.ticker != 'WATCHLIST_TICKER') {
                                     resp = await getTickerFollowedAnalyst(params.ticker);
                                     
-                                } else if (params.ticker == 'PORTFOLIO' && params.analyst == 'ALL_ANALYST') {
+                                } else if (params.ticker == 'PORTFOLIO_TICKER' && params.analyst == 'ALL_ANALYST') {
                                     resp = await getPortfolioTickerAllAnalyst();
 
-                                } else if (params.ticker == 'PORTFOLIO' && params.analyst == 'FOLLOW_ANALYST') {
+                                } else if (params.ticker == 'PORTFOLIO_TICKER' && params.analyst == 'FOLLOW_ANALYST') {
                                     resp = await getPortfolioTickerFollowedAnalyst();
 
                                 } else if (params.ticker == 'WATCHLIST_TICKER' && params.analyst == 'ALL_ANALYST') {
@@ -99,6 +99,14 @@ exports.handler = async (event, context) => {
                                     resp["mentions"] = await getMentions();                                    
                                     resp["stocks"] = await getTradedStocks();                                    
                                     resp["conversations"] = await getConversations();
+
+                                } else if (params.analyst == 'ALL_ANALYST') {
+                                    resp["followers"] = await getFollowFollowerCount();                                    
+                                    resp["activities"] = await getFollowActivity();                                    
+                                    resp["holdings"] = await getFollowHoldings();                                    
+                                    resp["mentions"] = await getFollowMentions();                                    
+                                    resp["stocks"] = await getFollowTradedStocks();                                    
+                                    resp["conversations"] = await getFollowConversations();
 
                                 } else {
                                     throw new Error("Missing/incorrect analyst parameter for insight method.");
@@ -199,7 +207,7 @@ function searchAnalyst(term) {
 function getAllTickerAllAnalyst() {
     sql = "SELECT c.date,c.ticker, c.tUserID, c.tUserName, a.name, \
             a.profilePicMini, c.tweet, \
-            CONCAT('https://twitter.com/',a.name,'/status/',c.tweetID) \
+            CONCAT('https://twitter.com/',c.tUserName,'/status/',c.tweetID) as 'tweetLink'\
             FROM Conversation c \
             INNER JOIN Analyst a on c.tUserID = a.tUserID \
             ORDER BY c.date DESC  \
@@ -211,7 +219,7 @@ function getAllTickerAllAnalyst() {
 function getAllTickerFollowedAnalyst() {
     sql = "SELECT c.date,c.ticker, c.tUserID, c.tUserName, \
             a.name, a.profilePicMini, c.tweet, \
-            CONCAT('https://twitter.com/',a.name,'/status/',c.tweetID) as 'tweetLink' \
+            CONCAT('https://twitter.com/',c.tUserName,'/status/',c.tweetID) as 'tweetLink' \
             FROM Conversation c \
             INNER JOIN Analyst a ON c.tUserID = a.tUserID \
             WHERE a.tUserID IN ( \
@@ -226,7 +234,7 @@ function getAllTickerFollowedAnalyst() {
 function getTickerAllAnalyst(ticker) {
     sql = "SELECT c.date,c.ticker, c.tUserID, c.tUserName, a.name, \
             a.profilePicMini, c.tweet, \
-            CONCAT('https://twitter.com/',a.name,'/status/',c.tweetID) as 'tweetLink' \
+            CONCAT('https://twitter.com/',c.tUserName,'/status/',c.tweetID) as 'tweetLink' \
             FROM Conversation c \
             INNER JOIN Analyst a on c.tUserID = a.tUserID \
             WHERE c.ticker = '" + ticker + "' \
@@ -240,7 +248,7 @@ function getTickerAllAnalyst(ticker) {
 function getTickerFollowedAnalyst(ticker) {
     sql = "SELECT c.date,c.ticker, c.tUserName,a.name, \
             a.profilePicMini,c.tweet, \
-            CONCAT('https://twitter.com/',a.name,'/status/',c.tweetID) as 'tweetLink' \
+            CONCAT('https://twitter.com/',c.tUserName,'/status/',c.tweetID) as 'tweetLink' \
             FROM Conversation c \
             INNER JOIN Analyst a ON c.tUserID = a.tUserID \
             WHERE a.tUserID IN ( \
@@ -256,7 +264,7 @@ function getTickerFollowedAnalyst(ticker) {
 function getPortfolioTickerAllAnalyst() {
     sql = "SELECT c.date,c.ticker, c.tUserID, c.tUserName, \
             a.name, a.profilePicMini, c.tweet, \
-            CONCAT('https://twitter.com/',a.name,'/status/',c.tweetID) as 'tweetLink' \
+            CONCAT('https://twitter.com/',c.tUserName,'/status/',c.tweetID) as 'tweetLink' \
             FROM Conversation c \
             INNER JOIN Analyst a on c.tUserID = a.tUserID \
             WHERE c.ticker IN ( \
@@ -271,7 +279,7 @@ function getPortfolioTickerAllAnalyst() {
 function getPortfolioTickerFollowedAnalyst() {
     sql = "SELECT c.date,c.ticker, c.tUserID, c.tUserName, \
             a.name, a.profilePicMini, c.tweet, \
-            CONCAT('https://twitter.com/',a.name,'/status/',c.tweetID) as 'tweetLink' \
+            CONCAT('https://twitter.com/',c.tUserName,'/status/',c.tweetID) as 'tweetLink' \
             FROM Conversation c \
             INNER JOIN Analyst a on c.tUserID = a.tUserID \
             WHERE c.ticker IN ( \
@@ -287,7 +295,7 @@ function getPortfolioTickerFollowedAnalyst() {
 function getWatchListTickerAllAnalyst() {
     sql = "SELECT c.date,c.ticker, c.tUserID, c.tUserName, \
             a.name, a.profilePicMini, c.tweet, \
-            CONCAT('https://twitter.com/',a.name,'/status/',c.tweetID) as 'tweetLink' \
+            CONCAT('https://twitter.com/',c.tUserName,'/status/',c.tweetID) as 'tweetLink' \
             FROM Conversation c \
             INNER JOIN Analyst a on c.tUserID = a.tUserID \
             WHERE c.ticker IN ( \
@@ -302,7 +310,7 @@ function getWatchListTickerAllAnalyst() {
 function getWatchListTickerFollowedAnalyst() {
     sql = "SELECT c.date,c.ticker, c.tUserID, c.tUserName, \
             a.name, a.profilePicMini, c.tweet, \
-            CONCAT('https://twitter.com/',a.name,'/status/',c.tweetID) as 'tweetLink' \
+            CONCAT('https://twitter.com/',c.tUserName,'/status/',c.tweetID) as 'tweetLink' \
             FROM Conversation c \
             INNER JOIN Analyst a on c.tUserID = a.tUserID \
             WHERE c.ticker IN ( \
@@ -339,7 +347,7 @@ function getActivity() {
 }
 
 function getHoldings() {
-    sql = "SELECT ticker, holding FROM fintwit.Stock ORDER BY holding desc LIMIT 100";
+    sql = "SELECT ticker, holding FROM Stock ORDER BY holding desc LIMIT 100";
     return executeQuery(sql);
 }
 
@@ -355,9 +363,9 @@ function getMentions() {
 }
 
 function getTradedStocks() {
-    sql = "SELECT ticker,COUNT(distinct pm.tUserID) as holding \
+    sql = "SELECT pm.ticker,COUNT(distinct pm.tUserID) as holding \
             FROM Portfolio_Master pm \
-            WHERE dateAdded > CURDATE()-7 \
+            WHERE pm.dateAdded > CURDATE()-7 \
             GROUP BY pm.ticker \
             ORDER BY holding desc \
             LIMIT 25";
@@ -379,6 +387,81 @@ function getConversations() {
     
     return executeQuery(sql); 
 }
+
+
+function getFollowFollowerCount() {
+    sql = "SELECT a.tUserID, a.tUserName,a.name,a.description, a.profilePicMini,a.followerCount, CONCAT('https://twitter.com/',a.tUserName) as 'twitterID' \
+            FROM Analyst a \
+            INNER JOIN Watchlist w on a.tUserID = w.value AND w.category = 'Analyst' AND w.username = '" + userid + "' \
+            ORDER BY  a.followerCount desc LIMIT 100";
+
+    return executeQuery(sql);            
+}
+
+function getFollowActivity() {
+    sql = "SELECT c.tUserID, c.tUserName,a.name,a.description, \
+            a.profilePicMini, a.followerCount, \
+            CONCAT('https://twitter.com/',c.tUserName) as 'twitterID', SUM(c.count) as posts \
+            FROM Conversation_Master c \
+            INNER JOIN Analyst a ON c.tUserID = a.tUserID \
+            INNER JOIN Watchlist w on a.tUserID = w.value AND w.category = 'Analyst' AND w.username = '" + userid + "' \
+            WHERE c.granularity = 'daily' \
+            GROUP BY c.tUserName \
+            ORDER BY posts desc LIMIT 100";
+
+    return executeQuery(sql);   
+}
+
+function getFollowHoldings() {
+    sql = "SELECT pm.ticker,COUNT(distinct pm.tUserID) as holding \
+    FROM  Portfolio_Master pm \
+    INNER JOIN Watchlist w on pm.tUserID = w.value AND w.category = 'Analyst' AND w.username = '" + userid + "' \
+    GROUP BY pm.ticker \
+    ORDER BY holding desc LIMIT 100";
+
+    return executeQuery(sql);
+}
+
+function getFollowMentions() {
+    sql = "SELECT c.ticker, SUM(c.count) as mentions \
+            FROM Conversation_Master c \
+            INNER JOIN Watchlist w on c.tUserID = w.value AND w.category = 'Analyst' AND w.username = '" + userid + "' \
+            WHERE c.granularity = 'daily'  and c.date > CURDATE() - 7 \
+            GROUP BY c.ticker \
+            ORDER BY mentions desc \
+            LIMIT 25";
+
+    return executeQuery(sql);
+}
+
+function getFollowTradedStocks() {
+    sql = "SELECT pm.ticker,COUNT(distinct pm.tUserID) as holding \
+            FROM Portfolio_Master pm \
+            INNER JOIN Watchlist w on pm.tUserID = w.value AND w.category = 'Analyst' AND w.username = '" + userid + "' \
+            WHERE pm.dateAdded > CURDATE()-7 \
+            GROUP BY pm.ticker \
+            ORDER BY holding desc \
+            LIMIT 25";
+
+    return executeQuery(sql);            
+}
+
+function getFollowConversations() {
+    sql = "SELECT cm.ticker,cm.Date, SUM(cm.count) cCount \
+            FROM Conversation_Master cm \
+            INNER JOIN Watchlist w on sm.tUserID = w.value AND w.category = 'Analyst' AND w.username = '" + userid + "' \
+            INNER JOIN (SELECT c.ticker, SUM(c.count) as mentions \
+            FROM Conversation_Master c \
+            WHERE c.granularity = 'daily'  and c.date > CURDATE() - 7 \
+            GROUP BY c.ticker \
+            ORDER BY mentions desc LIMIT 25) top25 on cm.ticker = top25.ticker \
+            WHERE cm.granularity = 'daily' and cm.Date > CURDATE() - 30 \
+            GROUP BY cm.ticker, cm.Date \
+            ORDER BY cm.ticker desc, Date desc";
+    
+    return executeQuery(sql); 
+}
+
 
 function getAnalystBio(analyst) {
     sql = "SELECT tUserID, tUserName,name, \
