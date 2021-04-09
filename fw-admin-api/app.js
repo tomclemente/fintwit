@@ -203,7 +203,7 @@ function  updateInsight(params) {
 
 function getInsight() {
     sql = "SELECT * FROM Insight  \
-            WHERE class IN ('PORTFOLIO','BOUGHT','SOLD') \
+            WHERE class IN ('PORTFOLIO','BOUGHT','SOLD','PARTIALSOLD') \
             AND processed ='N' LIMIT 100";
 
     return executeQuery(sql);
