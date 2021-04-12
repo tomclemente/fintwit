@@ -1506,7 +1506,7 @@ function updateSubscriptionNotification(username, params) {
 }
 
 function deleteUser(username) {
-        sql = "UPDATE User SET subscriptionStatus = 'DELETED' \
+        sql = "UPDATE User SET subscriptionStatus = 'INACTIVE' \
                WHERE email = '" + femail + "' ";
 
     return executeQuery(sql);
