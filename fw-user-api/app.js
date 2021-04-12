@@ -244,7 +244,7 @@ function sendEmail(params) {
 };
 
 function getUser() {
-    sql = "SELECT * FROM User WHERE username = '" + userid + "'";
+    sql = "SELECT * FROM User WHERE email = '" + femail + "'";
     return executeQuery(sql);
 }
 
@@ -477,9 +477,17 @@ function generateThankYouEmail() {
                                             <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px; font-family: Arial, sans-serif"><![endif]-->
                                             <div style="color:#525252;font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;line-height:1.5;padding-top:10px;padding-right:10px;padding-bottom:10px;padding-left:10px;">
                                                 <div style="line-height: 1.5; font-size: 12px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #525252; mso-line-height-alt: 18px;">
-                                                    <p style="line-height: 1.5; word-break: break-word; text-align: left; font-family: Helvetica; font-size: 15px; mso-line-height-alt: 23px; margin: 0;"><span style="font-size: 14px;">We analyze tweets from prominent analysts on twitter in real time to surface most traded stocks, trending tickers, investor sentiments and other trading signals. We cover over 6000 stocks from all major US exchanges.</span></p>
+                                                    <p style="line-height: 1.5; word-break: break-word; text-align: left; font-family: Helvetica; font-size: 15px; mso-line-height-alt: 23px; margin: 0;"><span style="font-size: 14px;">We analyze tweets from prominent analysts on twitter in real time to surface most traded stocks, trending tickers, investor sentiments and other trading signals.</span></p>
                                                 </div>
                                             </div>
+
+                                             <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px; font-family: Arial, sans-serif"><![endif]-->
+                                            <div style="color:#525252;font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;line-height:1.5;padding-top:10px;padding-right:10px;padding-bottom:10px;padding-left:10px;">
+                                                <div style="line-height: 1.5; font-size: 12px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #525252; mso-line-height-alt: 18px;">
+                                                    <p style="line-height: 1.5; word-break: break-word; text-align: left; font-family: Helvetica; font-size: 15px; mso-line-height-alt: 23px; margin: 0;"><span style="font-size: 14px;">We cover over <b>6000</b> stocks from all major US exchanges.</span></p>
+                                                </div>
+                                            </div>
+
  <p style="line-height: 1.5; font-family: Helvetica; word-break: break-word; mso-line-height-alt: 18px; margin: 0;">&nbsp;</p>
 
                                             <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px; font-family: Arial, sans-serif"><![endif]-->
@@ -1484,7 +1492,7 @@ function generateGoodbyeEmail() {
 
 function deactivateSubscription(username) {
     sql = "UPDATE User SET cancelledOn = CURRENT_TIMESTAMP() \
-            WHERE username = '" + username + "' ";
+            WHERE email = '" + femail + "' ";
 
     return executeQuery(sql);
 }
@@ -1492,13 +1500,15 @@ function deactivateSubscription(username) {
 
 function updateSubscriptionNotification(username, params) {
     sql = "UPDATE User SET notificationFlag = '" + params.notificationFlag + "' \
-            WHERE username = '" + username + "' ";
+            WHERE email = '" + femail + "' ";
 
     return executeQuery(sql);        
 }
 
 function deleteUser(username) {
-    sql = "DELETE FROM User WHERE username = '" + username + "' ";
+        sql = "UPDATE User SET subscriptionStatus = 'DELETED' \
+               WHERE email = '" + femail + "' ";
+
     return executeQuery(sql);
 }
 
@@ -1511,6 +1521,6 @@ function deleteCognitoUser() {
 }
 
 function deleteWatchlist(username) {
-    sql = "DELETE FROM Watchlist WHERE username = '" + username + "' ";
+    sql = "DELETE FROM Watchlist WHERE email = '" + femail + "' ";
     return executeQuery(sql);
 }
