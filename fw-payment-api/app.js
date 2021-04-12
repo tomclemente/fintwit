@@ -500,7 +500,7 @@ function generatePaymentConfirmation(params) {
                     </html>`
                 }
             },
-            Subject: { Data: "Payment confirmation!" }
+            Subject: { Data: "Subscription confirmation!" }
         },
         Source: sourceEmail
     };
