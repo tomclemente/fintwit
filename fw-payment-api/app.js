@@ -408,25 +408,27 @@ function generatePaymentConfirmation(params) {
                                                                 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px; font-family: Arial, sans-serif"><![endif]-->
                                                                 <div style="color:#525252;font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;line-height:1.5;padding-top:10px;padding-right:10px;padding-bottom:10px;padding-left:10px;">
                                                                     <div style="line-height: 1.5; font-size: 12px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #525252; mso-line-height-alt: 18px;">
-                                                                        <p style="line-height: 1.5; word-break: break-word; text-align: center; font-family: Helvetica; font-size: 24px; mso-line-height-alt: 36px; margin: 0;"><span style="font-size: 20px;">Payment Confirmation</span></p>
+                                                                        <p style="line-height: 1.5; word-break: break-word; text-align: center; font-family: Helvetica; font-size: 24px; mso-line-height-alt: 36px; margin: 0;"><span style="font-size: 20px;">Subscription Confirmation</span></p>
                                                                     </div>
                                                                 </div>
                                                                 
                                                                 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px; font-family: Arial, sans-serif"><![endif]-->
                                                                 <div style="color:#525252;font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;line-height:1.5;padding-top:10px;padding-right:10px;padding-bottom:10px;padding-left:10px;">
                                                                     <div style="line-height: 1.5; font-size: 12px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #525252; mso-line-height-alt: 18px;">
-                                                                        <p style="line-height: 1.5; word-break: break-word; text-align: center; font-family: Helvetica; font-size: 15px; mso-line-height-alt: 23px; margin: 0;"><span style="font-size: 14px;">We've successfully processed your payment. </span></p>
-                                                                        <p style="line-height: 1.5; font-family: Helvetica; word-break: break-word; mso-line-height-alt: 18px; margin: 0;">&nbsp;</p>
-                                                                        <p style="line-height: 1.5; word-break: break-word; text-align: left; font-family: Helvetica; font-size: 15px; mso-line-height-alt: 23px; margin: 0;"><span style="font-size: 14px;">Date: ${params.date} </span></p>
-                                                                        <p style="line-height: 1.5; word-break: break-word; text-align: left; font-family: Helvetica; font-size: 15px; mso-line-height-alt: 23px; margin: 0;"><span style="font-size: 14px;">Confirmation ID: ${params.confirmationID}</span></p>
-                                                                        <p style="line-height: 1.5; word-break: break-word; text-align: left; font-family: Helvetica; font-size: 15px; mso-line-height-alt: 23px; margin: 0;"><span style="font-size: 14px;">Plan: ${params.plan}</span></p>
-                                                                        <p style="line-height: 1.5; word-break: break-word; text-align: left; font-family: Helvetica; font-size: 15px; mso-line-height-alt: 23px; margin: 0;"><span style="font-size: 14px;">Amount: $${params.amount}</span></p>
-                                                                        
+                                                                        <p style="line-height: 1.5; word-break: break-word; text-align: center; font-family: Helvetica; font-size: 15px; mso-line-height-alt: 23px; margin: 0;"><span style="font-size: 14px;">Congrats, You’ve purchased the ${params.plan} subscription.</span></p>
                                                                         
                                                                     </div>
                                                                 </div>
                                                                 
-                                                                <p style="line-height: 1.5; font-family: Helvetica; word-break: break-word; mso-line-height-alt: 18px; margin: 0;">&nbsp;</p>
+                                                                  <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px; font-family: Arial, sans-serif"><![endif]-->
+                                                                <div style="color:#525252;font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;line-height:1.5;padding-top:10px;padding-right:10px;padding-bottom:10px;padding-left:10px;">
+                                                                    <div style="line-height: 1.5; font-size: 12px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #525252; mso-line-height-alt: 18px;">
+                                                                        <p style="line-height: 1.5; word-break: break-word; text-align: center; font-family: Helvetica; font-size: 15px; mso-line-height-alt: 23px; margin: 0;"><span style="font-size: 14px;">If you are on a free trial, your subscription will renew after 7 days.</span></p>
+                                                                        
+                                                                    </div>
+                                                                </div>
+
+                                                                
                                                                 <p style="line-height: 1.5; font-family: Helvetica; word-break: break-word; mso-line-height-alt: 18px; margin: 0;">&nbsp;</p>
                                                                 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px; font-family: Arial, sans-serif"><![endif]-->
                                                                 <div style="color:#525252;font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;line-height:1.5;padding-top:10px;padding-right:10px;padding-bottom:10px;padding-left:10px;">
