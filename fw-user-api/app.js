@@ -1520,7 +1520,7 @@ function updateSubscriptionNotification(username, params) {
 }
 
 function deleteUser(username) {
-        sql = "UPDATE User SET subscriptionStatus = null \
+        sql = "UPDATE User SET subscriptionStatus = null, clientSecretKey = null, oldPaymentMethodId = null, stripeCustomerId = null, subscriptionId = null, paymentMethodId = null \
                WHERE email = '" + femail + "' ";
 
     return executeQuery(sql);
