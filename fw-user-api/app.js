@@ -72,6 +72,9 @@ exports.handler = async (event, context) => {
 
                     case 'POST':      
                         getUser().then(async function(data) {
+ 
+
+
                             if (isEmpty(data)) {
 
                                 await insertUser(userid, fname, femail);
@@ -80,6 +83,10 @@ exports.handler = async (event, context) => {
                                 resolve(resp);
                             
                             } else {
+
+                                if(data[0].name != fname){
+                                    await updateName();
+                                }
                                 resolve(data);
                             }       
 
@@ -1488,6 +1495,13 @@ function generateGoodbyeEmail() {
     };
 
     return param;
+}
+
+function updateName() {
+    sql = "UPDATE User SET name = '" + fname + "' \
+            WHERE email = '" + femail + "' ";
+
+    return executeQuery(sql);
 }
 
 function deactivateSubscription(username) {
