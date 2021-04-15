@@ -61,21 +61,24 @@ exports.handler = async (event, context) => {
                                     
                                     if (!isEmpty(params) && params.watchlist == 'Y' && params.portfolio == 'Y' ) {
                                         resp["list"] = await getPWStocks(data[0].username);
-                                        resp["mentions"] = await getPWMentions();
+                                        resp["hotstocks"] = await getPWHotStocks();
                                         resp["positive"] = await getPWPositive();
                                         resp["negative"] = await getPWNegative();
+                                        resp["topholdings"] = await getPWTopHoldings();
 
                                     } else if (!isEmpty(params) && params.portfolio == 'Y') {
                                         resp["list"] = await getPortfolioStocks(data[0].username);
-                                        resp["mentions"] = await getPortfolioMentions();
+                                        resp["hotstocks"] = await getPortfolioHotStocks();
                                         resp["positive"] = await getPortfolioPositive();
                                         resp["negative"] = await getPortfolioNegative();
+                                        resp["topholdings"] = await getPortfolioTopHoldings();
 
                                     } else if (!isEmpty(params) && params.watchlist == 'Y') {
                                         resp["list"] = await getWatchList(data[0].username);
-                                        resp["mentions"] = await getWatchlistMentions();
+                                        resp["hotstocks"] = await getWatchlistHotStocks();
                                         resp["positive"] = await getWatchlistPositive();
                                         resp["negative"] = await getWatchlistNegative();
+                                        resp["topholdings"] = await getWatchlistTopHoldings();
 
                                     }else if (!isEmpty(params) && !isEmpty(params.search)) {
                                         resp = await getSearchList(params.search);
@@ -108,9 +111,10 @@ exports.handler = async (event, context) => {
                                         
                                     } else  {
                                         resp["list"] = await getStockList();   
-                                        resp["mentions"] = await getStockMentions();
+                                        resp["hotstocks"] = await getStockHotStocks();
                                         resp["positive"] = await getStockPositive();
                                         resp["negative"] = await getStockNegative();
+                                        resp["topholdings"] = await getStockTopHoldings();
                                     }
                                 
                                 } else if (data[0].subscriptionStatus == 'INCOMPLETE' || data[0].subscriptionStatus == 'PAYMENT_FAILED') {
@@ -368,7 +372,7 @@ function getTweet(ticker) {
     sql = "SELECT c.date,c.tUserName,a.name,a.profilePicMini,c.tweet,CONCAT('https://twitter.com/',a.name,'/status/',c.tweetID) as 'tweetLink'\
             FROM Conversation c \
             INNER JOIN Analyst a on c.tUserID = a.tUserID\
-            WHERE c.ticker = '" + ticker + "' \
+            WHERE c.ticker = '" + ticker + "' AND c.tweet NOT LIKE ('@%')\
             ORDER BY c.date DESC \
             LIMIT 100";
     return executeQuery(sql);
@@ -440,18 +444,27 @@ function getStockNegative() {
     return executeQuery(sql);
 }
 
-function getStockMentions() {
-    sql = "SELECT 'Top Mentions' as Category, c.ticker, sm.marketCap, sm.Price, sm.industry, SUM(c.count) as mentions, \
-            CASE WHEN w.category = 'Watchlist' THEN \
-            true ELSE false END AS watchlist, \
-            CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio \
-            FROM Conversation_Master c \
-            INNER JOIN Stock_Master sm on c.ticker = sm.ticker \
-            LEFT OUTER JOIN Watchlist w on c.ticker = w.value AND w.username = '" + userid + "' \
-            WHERE sm.isActive != 'N' AND c.granularity = 'daily' and c.date > CURDATE() - 7 \
-            GROUP BY c.ticker  \
-            ORDER BY mentions desc \
-            LIMIT 200";
+function getStockHotStocks() {
+    sql = "SELECT 'Hot Stocks' AS 'category',s.holdingChangePerc,sm.ticker,sm.company,sm.sector,sm.marketCap,sm.Price,CASE WHEN w.category = 'Watchlist'  THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio  \
+            FROM Stock s \
+            INNER JOIN Stock_Master sm on s.ticker = sm.ticker AND s.category = 'Portfolio' \
+            LEFT OUTER JOIN Watchlist w on s.ticker = w.value AND w.username = '" + userid + "'\
+            where sm.isActive != 'N' and s.holdingChange > 0\
+            order by s.holdingChangePerc desc limit 200";
+
+    return executeQuery(sql);
+}
+
+function getStockTopHoldings() {
+
+    sql = "SELECT s.category,s.holding,sm.ticker,sm.company,sm.sector,sm.marketCap,sm.Price,CASE WHEN w.category = 'Watchlist' THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio \
+            FROM Stock s \
+            INNER JOIN Stock_Master sm on s.ticker = sm.ticker AND s.category = 'Portfolio' \
+            LEFT OUTER JOIN Watchlist w on s.ticker = w.value AND w.username = '" + userid + "'\
+            where sm.isActive != 'N'\
+            order by s.holding desc limit 200";
+
+
     return executeQuery(sql);
 }
 
@@ -475,18 +488,31 @@ function getWatchlistNegative() {
     return executeQuery(sql);
 }
 
-function getWatchlistMentions() {
-    sql = "SELECT 'Top Mentions' as Category, c.ticker, sm.marketCap, sm.Price, sm.industry, SUM(c.count) as mentions, \
-            CASE WHEN w.value IS NULL THEN false ELSE true END AS watchlist, false as portfolio \
-            FROM Conversation_Master c \
-            INNER JOIN Stock_Master sm on c.ticker = sm.ticker \
-            INNER JOIN Watchlist w on c.ticker = w.value AND w.category = 'Watchlist'  AND w.username = '" + userid + "' \
-            WHERE sm.isActive != 'N' AND c.granularity = 'daily' and c.date > CURDATE() - 7 \
-            GROUP BY c.ticker \
-            ORDER BY mentions desc \
-            LIMIT 200";
+function getWatchlistHotStocks() {
+
+    sql = "SELECT 'Hot Stocks' AS 'category',s.holdingChangePerc,sm.ticker,sm.company,sm.sector,sm.marketCap,sm.Price,CASE WHEN w.value IS NULL THEN false ELSE true END AS watchlist, false as portfolio \
+            FROM Stock s \
+            INNER JOIN Stock_Master sm on s.ticker = sm.ticker AND s.category = 'Portfolio' \
+            INNER JOIN Watchlist w on s.ticker = w.value AND w.category = 'Watchlist' AND w.username = '" + userid + "'\
+            where sm.isActive != 'N' and s.holdingChangePerc > 0\
+            order by s.holdingChangePerc desc limit 200";
+
     return executeQuery(sql);
 }
+
+function getWatchlistTopHoldings() {
+
+    sql = "SELECT s.category,s.holding,sm.ticker,sm.company,sm.sector,sm.marketCap,sm.Price,CASE WHEN w.value IS NULL THEN false ELSE true END AS watchlist, false as portfolio  \
+            FROM Stock s \
+            INNER JOIN Stock_Master sm on s.ticker = sm.ticker AND s.category = 'Portfolio' \
+            INNER JOIN Watchlist w on s.ticker = w.value AND w.category = 'Watchlist' AND w.username = '" + userid + "'\
+            where sm.isActive != 'N'\
+            order by s.holding desc limit 200";
+
+    return executeQuery(sql);
+}
+
+
 
 function getPortfolioPositive() {
     sql = "SELECT 'Positive' AS 'category',s.sScore, s.sScoreChange,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.Price,sm.50DMA,sm.200DMA,false as watchlist, CASE WHEN w.value IS NULL THEN false ELSE true END AS portfolio \
@@ -508,18 +534,29 @@ function getPortfolioNegative() {
     return executeQuery(sql);
 }
 
-function getPortfolioMentions() {
-    sql = "SELECT 'Top Mentions' as Category, c.ticker, sm.marketCap, sm.Price, sm.industry, SUM(c.count) as mentions, \
-            CASE WHEN w.value IS NULL THEN false ELSE true END AS portfolio, false as watchlist \
-            FROM Conversation_Master c \
-            INNER JOIN Stock_Master sm on c.ticker = sm.ticker \
-            INNER JOIN Watchlist w on c.ticker = w.value AND w.category = 'Portfolio'  AND w.username = '" + userid + "' \
-            WHERE sm.isActive != 'N' AND c.granularity = 'daily' and c.date > CURDATE() - 7 \
-            GROUP BY c.ticker \
-            ORDER BY mentions desc \
-            LIMIT 200";
+function getPortfolioHotStocks() {
+    sql = "SELECT 'Hot Stocks' AS 'category',s.holdingChangePerc,sm.ticker,sm.company,sm.sector,sm.marketCap,sm.Price,false as watchlist, CASE WHEN w.value IS NULL THEN false ELSE true END AS portfolio \
+            FROM Stock s \
+            INNER JOIN Stock_Master sm on s.ticker = sm.ticker AND s.category = 'Portfolio' \
+            INNER JOIN Watchlist w on s.ticker = w.value AND w.category = 'Portfolio' AND w.username = '" + userid + "'\
+            where sm.isActive != 'N' and s.holdingChangePerc > 0\
+            order by s.holdingChangePerc desc limit 200";
+
     return executeQuery(sql);
 }
+
+function getPortfolioTopHoldings() {
+
+    sql = "SELECT s.category,s.holding,sm.ticker,sm.company,sm.sector,sm.marketCap,sm.Price,false as watchlist, CASE WHEN w.value IS NULL THEN false ELSE true END AS portfolio \
+            FROM Stock s \
+            INNER JOIN Stock_Master sm on s.ticker = sm.ticker AND s.category = 'Portfolio' \
+            INNER JOIN Watchlist w on s.ticker = w.value AND w.category = 'Portfolio' AND w.username = '" + userid + "'\
+            where sm.isActive != 'N'\
+            order by s.holding desc limit 200";
+
+    return executeQuery(sql);
+}
+
 
 function getPWPositive() {
     sql = "SELECT 'Positive' AS 'category', s.sScore, s.sScoreChange,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.Price,sm.50DMA,sm.200DMA,CASE WHEN w.category = 'Watchlist' THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio \
@@ -542,15 +579,25 @@ function getPWNegative() {
     return executeQuery(sql);
 }
 
-function getPWMentions() {
-    sql = "SELECT 'Top Mentions' as Category, c.ticker, sm.marketCap, sm.Price, sm.industry, SUM(c.count) as mentions, \
-            CASE WHEN w.category = 'Watchlist' THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio \
-            FROM Conversation_Master c \
-            INNER JOIN Stock_Master sm on c.ticker = sm.ticker \
-            INNER JOIN Watchlist w on c.ticker = w.value AND w.category in ('Portfolio','Watchlist')  AND w.username = '" + userid + "' \
-            WHERE sm.isActive != 'N' AND c.granularity = 'daily' and c.date > CURDATE() - 7 \
-            GROUP BY c.ticker \
-            ORDER BY mentions desc \
-            LIMIT 200";
+function getPWHotStocks() {
+    sql = "SELECT 'hotstocks' AS 'category',s.holdingChangePerc,sm.ticker,sm.company,sm.sector,sm.marketCap,sm.Price,CASE WHEN w.category = 'Watchlist' THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio \
+            FROM Stock s \
+            INNER JOIN Stock_Master sm on s.ticker = sm.ticker AND s.category = 'Portfolio' \
+            INNER JOIN Watchlist w on s.ticker = w.value AND w.category in ('Portfolio','Watchlist') AND w.username = '" + userid + "'\
+            where sm.isActive != 'N' and s.holdingChangePerc > 0\
+            order by s.holdingChangePerc desc limit 200";
+
+    return executeQuery(sql);
+}
+
+function getPWTopHoldings() {
+
+    sql = "SELECT s.category,s.holding,sm.ticker,sm.company,sm.sector,sm.marketCap,sm.Price,CASE WHEN w.category = 'Watchlist' THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio \
+            FROM Stock s \
+            INNER JOIN Stock_Master sm on s.ticker = sm.ticker AND s.category = 'Portfolio' \
+            INNER JOIN Watchlist w on s.ticker = w.value AND w.category in ('Portfolio','Watchlist') AND w.username = '" + userid + "'\
+            where sm.isActive != 'N'\
+            order by s.holding desc limit 200";
+
     return executeQuery(sql);
 }
