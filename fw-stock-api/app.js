@@ -208,25 +208,25 @@ function getSearchList(search) {
 
 function getPWStocks(username) {
    
-   sql = "(SELECT s.category,s.trendingScore, s.trendingScoreChange, s.sScore, s.sScoreChange,ROW_NUMBER() OVER (ORDER BY s.holding DESC ) AS tickerRank, s.holding,s.holdingChange,s.holdingChangePerc,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,sm.Price,sm.50DMA,sm.200DMA,sm.priceChangeDollar,sm.priceChangePerc,sm.lastUpdatedDate,sm.priceType,CASE WHEN w.category = 'Watchlist' THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio \
+   sql = "(SELECT s.category,s.trendingScore, s.trendingScoreChange, s.sScore, s.sScoreChange,ROW_NUMBER() OVER (ORDER BY s.holding DESC ) AS tickerRank, s.holding,s.holdingChange,s.holdingChangePerc,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,ROUND(sm.Price,2) as Price,sm.50DMA,sm.200DMA,ROUND(sm.priceChangeDollar,2) as priceChangeDollar,ROUND(sm.priceChangePerc,2) as priceChangePerc,sm.lastUpdatedDate,sm.priceType,CASE WHEN w.category = 'Watchlist' THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio \
             FROM Stock s \
             INNER JOIN Stock_Master sm on s.ticker = sm.ticker AND s.category = 'Portfolio' \
             INNER JOIN Watchlist w on s.ticker = w.value AND w.category in ('Portfolio','Watchlist') AND w.username = '" + userid + "'\
             where sm.isActive != 'N'\
             order by s.holding desc limit 200) UNION ALL \
-             (SELECT 'Top Buys' AS 'category',s.trendingScore, s.trendingScoreChange, s.sScore, s.sScoreChange,ROW_NUMBER() OVER (ORDER BY s.holdingChangePerc DESC ) AS tickerRank, s.holding,s.holdingChange,s.holdingChangePerc,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,sm.Price,sm.50DMA,sm.200DMA,sm.priceChangeDollar,sm.priceChangePerc,sm.lastUpdatedDate,sm.priceType,CASE WHEN w.category = 'Watchlist' THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio \
+             (SELECT 'Top Buys' AS 'category',s.trendingScore, s.trendingScoreChange, s.sScore, s.sScoreChange,ROW_NUMBER() OVER (ORDER BY s.holdingChangePerc DESC ) AS tickerRank, s.holding,s.holdingChange,s.holdingChangePerc,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,ROUND(sm.Price,2) as Price,sm.50DMA,sm.200DMA,ROUND(sm.priceChangeDollar,2) as priceChangeDollar,ROUND(sm.priceChangePerc,2) as priceChangePerc,sm.lastUpdatedDate,sm.priceType,CASE WHEN w.category = 'Watchlist' THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio \
             FROM Stock s \
             INNER JOIN Stock_Master sm on s.ticker = sm.ticker AND s.category = 'Portfolio' \
             INNER JOIN Watchlist w on s.ticker = w.value AND w.category in ('Portfolio','Watchlist') AND w.username = '" + userid + "'\
             where sm.isActive != 'N' and s.holdingChangePerc > 0\
             order by s.holdingChangePerc desc limit 200) UNION ALL \
-            (SELECT 'Top Sells' AS 'category',s.trendingScore, s.trendingScoreChange, s.sScore, s.sScoreChange,ROW_NUMBER() OVER (ORDER BY s.holdingChangePerc ASC ) AS tickerRank, s.holding,s.holdingChange,s.holdingChangePerc,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,sm.Price,sm.50DMA,sm.200DMA,sm.priceChangeDollar,sm.priceChangePerc,sm.lastUpdatedDate,sm.priceType,CASE WHEN w.category = 'Watchlist' THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio \
+            (SELECT 'Top Sells' AS 'category',s.trendingScore, s.trendingScoreChange, s.sScore, s.sScoreChange,ROW_NUMBER() OVER (ORDER BY s.holdingChangePerc ASC ) AS tickerRank, s.holding,s.holdingChange,s.holdingChangePerc,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,ROUND(sm.Price,2) as Price,sm.50DMA,sm.200DMA,ROUND(sm.priceChangeDollar,2) as priceChangeDollar,ROUND(sm.priceChangePerc,2) as priceChangePerc,sm.lastUpdatedDate,sm.priceType,CASE WHEN w.category = 'Watchlist' THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio \
             FROM Stock s \
             INNER JOIN Stock_Master sm on s.ticker = sm.ticker AND s.category = 'Portfolio' \
             INNER JOIN Watchlist w on s.ticker = w.value AND w.category in ('Portfolio','Watchlist') AND w.username = '" + userid + "'\
             where sm.isActive != 'N' and s.holdingChangePerc < 0\
             order by s.holdingChangePerc asc limit 200) UNION ALL \
-           (SELECT s.category,s.trendingScore, s.trendingScoreChange, s.sScore, s.sScoreChange,ROW_NUMBER() OVER (ORDER BY s.trendingScore DESC ) AS tickerRank, s.holding,s.holdingChange,s.holdingChangePerc,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,sm.Price,sm.50DMA,sm.200DMA,sm.priceChangeDollar,sm.priceChangePerc,sm.lastUpdatedDate,sm.priceType, CASE WHEN w.category = 'Watchlist' THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio \
+           (SELECT s.category,s.trendingScore, s.trendingScoreChange, s.sScore, s.sScoreChange,ROW_NUMBER() OVER (ORDER BY s.trendingScore DESC ) AS tickerRank, s.holding,s.holdingChange,s.holdingChangePerc,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,ROUND(sm.Price,2) as Price,sm.50DMA,sm.200DMA,ROUND(sm.priceChangeDollar,2) as priceChangeDollar,ROUND(sm.priceChangePerc,2) as priceChangePerc,sm.lastUpdatedDate,sm.priceType, CASE WHEN w.category = 'Watchlist' THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio \
             FROM Stock s  \
             INNER JOIN Stock_Master sm on s.ticker = sm.ticker and s.category = 'Trending' \
             INNER JOIN Watchlist w on s.ticker = w.value AND w.category in ('Portfolio','Watchlist') AND w.username = '" + userid + "'\
@@ -240,25 +240,25 @@ function getPWStocks(username) {
 
 function getPortfolioStocks(username) {
    
-   sql = "(SELECT s.category,s.trendingScore, s.trendingScoreChange, s.sScore, s.sScoreChange,ROW_NUMBER() OVER (ORDER BY s.holding DESC ) AS tickerRank, s.holding,s.holdingChange,s.holdingChangePerc,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,sm.Price,sm.50DMA,sm.200DMA,sm.priceChangeDollar,sm.priceChangePerc,sm.lastUpdatedDate,sm.priceType,false as watchlist, CASE WHEN w.value IS NULL THEN false ELSE true END AS portfolio \
+   sql = "(SELECT s.category,s.trendingScore, s.trendingScoreChange, s.sScore, s.sScoreChange,ROW_NUMBER() OVER (ORDER BY s.holding DESC ) AS tickerRank, s.holding,s.holdingChange,s.holdingChangePerc,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,ROUND(sm.Price,2) as Price,sm.50DMA,sm.200DMA,ROUND(sm.priceChangeDollar,2) as priceChangeDollar,ROUND(sm.priceChangePerc,2) as priceChangePerc,sm.lastUpdatedDate,sm.priceType,false as watchlist, CASE WHEN w.value IS NULL THEN false ELSE true END AS portfolio \
             FROM Stock s \
             INNER JOIN Stock_Master sm on s.ticker = sm.ticker AND s.category = 'Portfolio' \
             INNER JOIN Watchlist w on s.ticker = w.value AND w.category = 'Portfolio' AND w.username = '" + userid + "'\
             where sm.isActive != 'N'\
             order by s.holding desc limit 200) UNION ALL \
-             (SELECT 'Top Buys' AS 'category',s.trendingScore, s.trendingScoreChange, s.sScore, s.sScoreChange,ROW_NUMBER() OVER (ORDER BY s.holdingChangePerc DESC ) AS tickerRank, s.holding,s.holdingChange,s.holdingChangePerc,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,sm.Price,sm.50DMA,sm.200DMA,sm.priceChangeDollar,sm.priceChangePerc,sm.lastUpdatedDate,sm.priceType,false as watchlist, CASE WHEN w.value IS NULL THEN false ELSE true END AS portfolio \
+             (SELECT 'Top Buys' AS 'category',s.trendingScore, s.trendingScoreChange, s.sScore, s.sScoreChange,ROW_NUMBER() OVER (ORDER BY s.holdingChangePerc DESC ) AS tickerRank, s.holding,s.holdingChange,s.holdingChangePerc,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,ROUND(sm.Price,2) as Price,sm.50DMA,sm.200DMA,ROUND(sm.priceChangeDollar,2) as priceChangeDollar,ROUND(sm.priceChangePerc,2) as priceChangePerc,sm.lastUpdatedDate,sm.priceType,false as watchlist, CASE WHEN w.value IS NULL THEN false ELSE true END AS portfolio \
             FROM Stock s \
             INNER JOIN Stock_Master sm on s.ticker = sm.ticker AND s.category = 'Portfolio' \
             INNER JOIN Watchlist w on s.ticker = w.value AND w.category = 'Portfolio' AND w.username = '" + userid + "'\
             where sm.isActive != 'N' and s.holdingChangePerc > 0\
             order by s.holdingChangePerc desc limit 200) UNION ALL \
-             (SELECT 'Top Sells' AS 'category',s.trendingScore, s.trendingScoreChange, s.sScore, s.sScoreChange,ROW_NUMBER() OVER (ORDER BY s.holdingChangePerc ASC ) AS tickerRank, s.holding,s.holdingChange,s.holdingChangePerc,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,sm.Price,sm.50DMA,sm.200DMA,sm.priceChangeDollar,sm.priceChangePerc,sm.lastUpdatedDate,sm.priceType,false as watchlist, CASE WHEN w.value IS NULL THEN false ELSE true END AS portfolio \
+             (SELECT 'Top Sells' AS 'category',s.trendingScore, s.trendingScoreChange, s.sScore, s.sScoreChange,ROW_NUMBER() OVER (ORDER BY s.holdingChangePerc ASC ) AS tickerRank, s.holding,s.holdingChange,s.holdingChangePerc,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,ROUND(sm.Price,2) as Price,sm.50DMA,sm.200DMA,ROUND(sm.priceChangeDollar,2) as priceChangeDollar,ROUND(sm.priceChangePerc,2) as priceChangePerc,sm.lastUpdatedDate,sm.priceType,false as watchlist, CASE WHEN w.value IS NULL THEN false ELSE true END AS portfolio \
             FROM Stock s \
             INNER JOIN Stock_Master sm on s.ticker = sm.ticker AND s.category = 'Portfolio' \
             INNER JOIN Watchlist w on s.ticker = w.value AND w.category = 'Portfolio' AND w.username = '" + userid + "'\
             where sm.isActive != 'N' and s.holdingChangePerc < 0\
             order by s.holdingChangePerc ASC limit 200) UNION ALL \
-           (SELECT s.category,s.trendingScore, s.trendingScoreChange, s.sScore, s.sScoreChange,ROW_NUMBER() OVER (ORDER BY s.trendingScore DESC ) AS tickerRank, s.holding,s.holdingChange,s.holdingChangePerc,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,sm.Price,sm.50DMA,sm.200DMA,sm.priceChangeDollar,sm.priceChangePerc,sm.lastUpdatedDate,sm.priceType,false as watchlist, CASE WHEN w.value IS NULL THEN false ELSE true END AS portfolio \
+           (SELECT s.category,s.trendingScore, s.trendingScoreChange, s.sScore, s.sScoreChange,ROW_NUMBER() OVER (ORDER BY s.trendingScore DESC ) AS tickerRank, s.holding,s.holdingChange,s.holdingChangePerc,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,ROUND(sm.Price,2) as Price,sm.50DMA,sm.200DMA,ROUND(sm.priceChangeDollar,2) as priceChangeDollar,ROUND(sm.priceChangePerc,2) as priceChangePerc,sm.lastUpdatedDate,sm.priceType,false as watchlist, CASE WHEN w.value IS NULL THEN false ELSE true END AS portfolio \
             FROM Stock s  \
             INNER JOIN Stock_Master sm on s.ticker = sm.ticker and s.category = 'Trending' \
             INNER JOIN Watchlist w on s.ticker = w.value AND w.category = 'Portfolio' AND w.username = '" + userid + "'\
@@ -272,25 +272,25 @@ function getPortfolioStocks(username) {
 
 function getWatchList(username) {
    
-   sql = "(SELECT s.category,s.trendingScore, s.trendingScoreChange, s.sScore, s.sScoreChange,ROW_NUMBER() OVER (ORDER BY s.holding DESC ) AS tickerRank, s.holding,s.holdingChange,s.holdingChangePerc,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,sm.Price,sm.50DMA,sm.200DMA,sm.priceChangeDollar,sm.priceChangePerc,sm.lastUpdatedDate,sm.priceType,CASE WHEN w.value IS NULL THEN false ELSE true END AS watchlist, false as portfolio  \
+   sql = "(SELECT s.category,s.trendingScore, s.trendingScoreChange, s.sScore, s.sScoreChange,ROW_NUMBER() OVER (ORDER BY s.holding DESC ) AS tickerRank, s.holding,s.holdingChange,s.holdingChangePerc,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,ROUND(sm.Price,2) as Price,sm.50DMA,sm.200DMA,ROUND(sm.priceChangeDollar,2) as priceChangeDollar,ROUND(sm.priceChangePerc,2) as priceChangePerc,sm.lastUpdatedDate,sm.priceType,CASE WHEN w.value IS NULL THEN false ELSE true END AS watchlist, false as portfolio  \
             FROM Stock s \
             INNER JOIN Stock_Master sm on s.ticker = sm.ticker AND s.category = 'Portfolio' \
             INNER JOIN Watchlist w on s.ticker = w.value AND w.category = 'Watchlist' AND w.username = '" + userid + "'\
             where sm.isActive != 'N'\
             order by s.holding desc limit 200) UNION ALL \
-             (SELECT 'Top Buys' AS 'category',s.trendingScore, s.trendingScoreChange, s.sScore, s.sScoreChange,ROW_NUMBER() OVER (ORDER BY s.holdingChangePerc DESC ) AS tickerRank, s.holding,s.holdingChange,s.holdingChangePerc,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,sm.Price,sm.50DMA,sm.200DMA,sm.priceChangeDollar,sm.priceChangePerc,sm.lastUpdatedDate,sm.priceType,CASE WHEN w.value IS NULL THEN false ELSE true END AS watchlist, false as portfolio \
+             (SELECT 'Top Buys' AS 'category',s.trendingScore, s.trendingScoreChange, s.sScore, s.sScoreChange,ROW_NUMBER() OVER (ORDER BY s.holdingChangePerc DESC ) AS tickerRank, s.holding,s.holdingChange,s.holdingChangePerc,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,ROUND(sm.Price,2) as Price,sm.50DMA,sm.200DMA,ROUND(sm.priceChangeDollar,2) as priceChangeDollar,ROUND(sm.priceChangePerc,2) as priceChangePerc,sm.lastUpdatedDate,sm.priceType,CASE WHEN w.value IS NULL THEN false ELSE true END AS watchlist, false as portfolio \
             FROM Stock s \
             INNER JOIN Stock_Master sm on s.ticker = sm.ticker AND s.category = 'Portfolio' \
             INNER JOIN Watchlist w on s.ticker = w.value AND w.category = 'Watchlist' AND w.username = '" + userid + "'\
             where sm.isActive != 'N' and s.holdingChangePerc > 0\
             order by s.holdingChangePerc desc limit 200) UNION ALL \
-             (SELECT 'Top Sells' AS 'category',s.trendingScore, s.trendingScoreChange, s.sScore, s.sScoreChange,ROW_NUMBER() OVER (ORDER BY s.holdingChangePerc ASC ) AS tickerRank, s.holding,s.holdingChange,s.holdingChangePerc,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,sm.Price,sm.50DMA,sm.200DMA,sm.priceChangeDollar,sm.priceChangePerc,sm.lastUpdatedDate,sm.priceType,CASE WHEN w.value IS NULL THEN false ELSE true END AS watchlist, false as portfolio \
+             (SELECT 'Top Sells' AS 'category',s.trendingScore, s.trendingScoreChange, s.sScore, s.sScoreChange,ROW_NUMBER() OVER (ORDER BY s.holdingChangePerc ASC ) AS tickerRank, s.holding,s.holdingChange,s.holdingChangePerc,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,ROUND(sm.Price,2) as Price,sm.50DMA,sm.200DMA,ROUND(sm.priceChangeDollar,2) as priceChangeDollar,ROUND(sm.priceChangePerc,2) as priceChangePerc,sm.lastUpdatedDate,sm.priceType,CASE WHEN w.value IS NULL THEN false ELSE true END AS watchlist, false as portfolio \
             FROM Stock s \
             INNER JOIN Stock_Master sm on s.ticker = sm.ticker AND s.category = 'Portfolio' \
             INNER JOIN Watchlist w on s.ticker = w.value AND w.category = 'Watchlist' AND w.username = '" + userid + "'\
             where sm.isActive != 'N' and s.holdingChangePerc < 0\
             order by s.holdingChangePerc ASC limit 200) UNION ALL \
-           (SELECT s.category,s.trendingScore, s.trendingScoreChange, s.sScore, s.sScoreChange,ROW_NUMBER() OVER (ORDER BY s.trendingScore DESC ) AS tickerRank, s.holding,s.holdingChange,s.holdingChangePerc,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,sm.Price,sm.50DMA,sm.200DMA,sm.priceChangeDollar,sm.priceChangePerc,sm.lastUpdatedDate,sm.priceType,CASE WHEN w.value IS NULL THEN false ELSE true END AS watchlist, false as portfolio  \
+           (SELECT s.category,s.trendingScore, s.trendingScoreChange, s.sScore, s.sScoreChange,ROW_NUMBER() OVER (ORDER BY s.trendingScore DESC ) AS tickerRank, s.holding,s.holdingChange,s.holdingChangePerc,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,ROUND(sm.Price,2) as Price,sm.50DMA,sm.200DMA,ROUND(sm.priceChangeDollar,2) as priceChangeDollar,ROUND(sm.priceChangePerc,2) as priceChangePerc,sm.lastUpdatedDate,sm.priceType,CASE WHEN w.value IS NULL THEN false ELSE true END AS watchlist, false as portfolio  \
             FROM Stock s  \
             INNER JOIN Stock_Master sm on s.ticker = sm.ticker and s.category = 'Trending' \
             INNER JOIN Watchlist w on s.ticker = w.value AND w.category = 'Watchlist' AND w.username = '" + userid + "'\
@@ -303,25 +303,25 @@ function getWatchList(username) {
 }
 //comment
 function getStockList() {
-    sql = "(SELECT s.category,s.trendingScore, s.trendingScoreChange, s.sScore, s.sScoreChange,ROW_NUMBER() OVER (ORDER BY s.holding DESC ) AS tickerRank, s.holding,s.holdingChange,s.holdingChangePerc,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,sm.Price,sm.50DMA,sm.200DMA,sm.priceChangeDollar,sm.priceChangePerc,sm.lastUpdatedDate,sm.priceType,CASE WHEN w.category = 'Watchlist' THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio \
+    sql = "(SELECT s.category,s.trendingScore, s.trendingScoreChange, s.sScore, s.sScoreChange,ROW_NUMBER() OVER (ORDER BY s.holding DESC ) AS tickerRank, s.holding,s.holdingChange,s.holdingChangePerc,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,ROUND(sm.Price,2) as Price,sm.50DMA,sm.200DMA,ROUND(sm.priceChangeDollar,2) as priceChangeDollar,ROUND(sm.priceChangePerc,2) as priceChangePerc,sm.lastUpdatedDate,sm.priceType,CASE WHEN w.category = 'Watchlist' THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio \
             FROM Stock s \
             INNER JOIN Stock_Master sm on s.ticker = sm.ticker AND s.category = 'Portfolio' \
             LEFT OUTER JOIN Watchlist w on s.ticker = w.value AND w.username = '" + userid + "'\
             where sm.isActive != 'N'\
             order by s.holding desc limit 200) UNION ALL \
-            (SELECT 'Top Buys' AS 'category',s.trendingScore, s.trendingScoreChange, s.sScore, s.sScoreChange,ROW_NUMBER() OVER (ORDER BY s.holdingChangePerc DESC ) AS tickerRank, s.holding,s.holdingChange,s.holdingChangePerc,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,sm.Price,sm.50DMA,sm.200DMA,sm.priceChangeDollar,sm.priceChangePerc,sm.lastUpdatedDate,sm.priceType,CASE WHEN w.category = 'Watchlist'  THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio  \
+            (SELECT 'Top Buys' AS 'category',s.trendingScore, s.trendingScoreChange, s.sScore, s.sScoreChange,ROW_NUMBER() OVER (ORDER BY s.holdingChangePerc DESC ) AS tickerRank, s.holding,s.holdingChange,s.holdingChangePerc,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,ROUND(sm.Price,2) as Price,sm.50DMA,sm.200DMA,ROUND(sm.priceChangeDollar,2) as priceChangeDollar,ROUND(sm.priceChangePerc,2) as priceChangePerc,sm.lastUpdatedDate,sm.priceType,CASE WHEN w.category = 'Watchlist'  THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio  \
             FROM Stock s \
             INNER JOIN Stock_Master sm on s.ticker = sm.ticker AND s.category = 'Portfolio' \
             LEFT OUTER JOIN Watchlist w on s.ticker = w.value AND w.username = '" + userid + "'\
             where sm.isActive != 'N' and s.holdingChange > 0\
             order by s.holdingChangePerc desc limit 200) UNION ALL \
-            (SELECT 'Top Sells' AS 'category',s.trendingScore, s.trendingScoreChange, s.sScore, s.sScoreChange,ROW_NUMBER() OVER (ORDER BY s.holdingChangePerc ASC ) AS tickerRank, s.holding,s.holdingChange,s.holdingChangePerc,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,sm.Price,sm.50DMA,sm.200DMA,sm.priceChangeDollar,sm.priceChangePerc,sm.lastUpdatedDate,sm.priceType,CASE WHEN w.category = 'Watchlist'  THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio  \
+            (SELECT 'Top Sells' AS 'category',s.trendingScore, s.trendingScoreChange, s.sScore, s.sScoreChange,ROW_NUMBER() OVER (ORDER BY s.holdingChangePerc ASC ) AS tickerRank, s.holding,s.holdingChange,s.holdingChangePerc,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,ROUND(sm.Price,2) as Price,sm.50DMA,sm.200DMA,ROUND(sm.priceChangeDollar,2) as priceChangeDollar,ROUND(sm.priceChangePerc,2) as priceChangePerc,sm.lastUpdatedDate,sm.priceType,CASE WHEN w.category = 'Watchlist'  THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio  \
             FROM Stock s \
             INNER JOIN Stock_Master sm on s.ticker = sm.ticker AND s.category = 'Portfolio' \
             LEFT OUTER JOIN Watchlist w on s.ticker = w.value AND w.username = '" + userid + "'\
             where sm.isActive != 'N' and s.holdingChange < 0\
             order by s.holdingChangePerc asc limit 200) UNION ALL \
-           (SELECT s.category,s.trendingScore, s.trendingScoreChange, s.sScore, s.sScoreChange,ROW_NUMBER() OVER (ORDER BY s.trendingScore DESC ) AS tickerRank, s.holding,s.holdingChange,s.holdingChangePerc,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,sm.Price,sm.50DMA,sm.200DMA,sm.priceChangeDollar,sm.priceChangePerc,sm.lastUpdatedDate,sm.priceType,CASE WHEN w.category = 'Watchlist' THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio  \
+           (SELECT s.category,s.trendingScore, s.trendingScoreChange, s.sScore, s.sScoreChange,ROW_NUMBER() OVER (ORDER BY s.trendingScore DESC ) AS tickerRank, s.holding,s.holdingChange,s.holdingChangePerc,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,ROUND(sm.Price,2) as Price,sm.50DMA,sm.200DMA,ROUND(sm.priceChangeDollar,2) as priceChangeDollar,ROUND(sm.priceChangePerc,2) as priceChangePerc,sm.lastUpdatedDate,sm.priceType,CASE WHEN w.category = 'Watchlist' THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio  \
             FROM Stock s  \
             INNER JOIN Stock_Master sm on s.ticker = sm.ticker and s.category = 'Trending' \
             LEFT OUTER JOIN Watchlist w on s.ticker = w.value AND w.username = '" + userid + "'\
@@ -338,7 +338,7 @@ function getTicker(params) {
 }
 
 function getStockMaster(ticker) {
-    sql = "SELECT sm.*, CASE WHEN w.category = 'Watchlist' THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio \
+    sql = "SELECT sm.ticker,sm.company,sm.industry,sm.exchange,sm.country,sm.currency,sm.sector,sm.marketcap,ROUND(sm.PERatio,2) as PERatio,sm.DividendYield*100 as DividendYield,sm.EPS,sm.52WeekHigh,sm.52WeekLow, ROUND(sm.Price,2) as Price, ROUND(sm.openPrice,2) as openPrice,ROUND(sm.lowPrice,2) as lowPrice,ROUND(sm.highPrice,2) as highPrice,sm.volume,sm.lastClosingPrice,ROUND(sm.priceChangeDollar,2) as priceChangeDollar, ROUND(sm.priceChangePerc, 2) as priceChangePerc,sm.lastUpdatedDate,ROUND(sm.extendedHoursPrice,2) as extendedHoursPrice,ROUND(sm.extendedHoursChange,2) as extendedHoursChange, ROUND(sm.extendedHoursChangePerc,2) as extendedHoursChangePerc,sm.priceType, CASE WHEN w.category = 'Watchlist' THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio \
             FROM Stock_Master sm \
             LEFT OUTER JOIN Watchlist w on sm.ticker = w.value AND w.username = '" + userid + "'\
             WHERE sm.isActive != 'N' and sm.ticker = '" + ticker + "' ";
@@ -390,7 +390,7 @@ function getNews(ticker) {
 
 function getInfluencers(ticker) {
 
-    sql = "SELECT c.tUserName,a.name,a.description,a.profilePicMini, CONCAT('https://twitter.com/',c.tUserName) as 'twitterID', (SUM(c.count)*100/(Select SUM(cm.count) from Conversation_Master cm where cm.granularity = 'daily' and cm.ticker = '" + ticker + "')) as 'Perc'\
+    sql = "SELECT c.tUserName,a.name,a.description,a.profilePicMini, CONCAT('https://twitter.com/',c.tUserName) as 'twitterID', ROUND(SUM(c.count)*100/(Select SUM(cm.count) from Conversation_Master cm where cm.granularity = 'daily' and cm.ticker = '" + ticker + "'),1) as 'Perc'\
            FROM Conversation_Master c \
            INNER JOIN Analyst a on c.tUserID = a.tUserID \
            WHERE c.granularity = 'daily' and c.ticker = '" + ticker + "'\
@@ -429,8 +429,8 @@ function getStockPositive() {
             FROM Stock s  \
             INNER JOIN Stock_Master sm on s.ticker = sm.ticker and s.category = 'Trending' \
             LEFT OUTER JOIN Watchlist w on s.ticker = w.value AND w.username = '" + userid + "'\
-            where sm.isActive != 'N' and s.sScore > 0 \
-            order by s.sScore desc limit 200";
+            where sm.isActive != 'N' and s.sScore > 0 and s.coverage >= 1\
+            order by s.sScore desc, s.coverage desc  limit 200";
     return executeQuery(sql);
 }
 
@@ -439,8 +439,8 @@ function getStockNegative() {
             FROM Stock s  \
             INNER JOIN Stock_Master sm on s.ticker = sm.ticker and s.category = 'Trending' \
             LEFT OUTER JOIN Watchlist w on s.ticker = w.value AND w.username = '" + userid + "'\
-            where sm.isActive != 'N' and s.sScore <= 0\
-            order by s.sScore asc limit 200";
+            where sm.isActive != 'N' and s.sScore <= 0 and s.coverage >= 1\
+            order by s.sScore asc,s.coverage desc  limit 200";
     return executeQuery(sql);
 }
 
@@ -484,7 +484,7 @@ function getWatchlistNegative() {
             INNER JOIN Stock_Master sm on s.ticker = sm.ticker and s.category = 'Trending' \
             INNER JOIN Watchlist w on s.ticker = w.value AND w.category = 'Watchlist' AND w.username = '" + userid + "'\
             where sm.isActive != 'N' and s.sScore <= 0\
-            order by s.sScore asc limit 200";
+            order by s.sScore asc,s.coverage desc limit 200";
     return executeQuery(sql);
 }
 
@@ -495,7 +495,7 @@ function getWatchlistHotStocks() {
             INNER JOIN Stock_Master sm on s.ticker = sm.ticker AND s.category = 'Portfolio' \
             INNER JOIN Watchlist w on s.ticker = w.value AND w.category = 'Watchlist' AND w.username = '" + userid + "'\
             where sm.isActive != 'N' and s.holdingChangePerc > 0\
-            order by s.holdingChangePerc desc limit 200";
+            order by s.holdingChangePerc desc,s.coverage desc limit 200";
 
     return executeQuery(sql);
 }
@@ -520,7 +520,7 @@ function getPortfolioPositive() {
             INNER JOIN Stock_Master sm on s.ticker = sm.ticker and s.category = 'Trending' \
             INNER JOIN Watchlist w on s.ticker = w.value AND w.category = 'Portfolio' AND w.username = '" + userid + "'\
             where sm.isActive != 'N' and s.sScore > 0\
-            order by s.sScore desc limit 200";
+            order by s.sScore desc,s.coverage desc  limit 200";
     return executeQuery(sql);
 }
 
@@ -530,7 +530,7 @@ function getPortfolioNegative() {
             INNER JOIN Stock_Master sm on s.ticker = sm.ticker and s.category = 'Trending' \
             INNER JOIN Watchlist w on s.ticker = w.value AND w.category = 'Portfolio' AND w.username = '" + userid + "'\
             where sm.isActive != 'N' and s.sScore <= 0\
-            order by s.sScore asc limit 200";
+            order by s.sScore asc,s.coverage desc  limit 200";
     return executeQuery(sql);
 }
 
@@ -563,8 +563,8 @@ function getPWPositive() {
             FROM Stock s  \
             INNER JOIN Stock_Master sm on s.ticker = sm.ticker and s.category = 'Trending' \
             INNER JOIN Watchlist w on s.ticker = w.value AND w.category in ('Portfolio','Watchlist') AND w.username = '" + userid + "'\
-            where sm.isActive != 'N' and s.sScore > 0\
-            order by s.sScore desc limit 200" ;
+            where sm.isActive != 'N' and s.sScore > 0 \
+            order by s.sScore desc, s.coverage desc limit 200" ;
 
     return executeQuery(sql);
 }
@@ -575,7 +575,7 @@ function getPWNegative() {
             INNER JOIN Stock_Master sm on s.ticker = sm.ticker and s.category = 'Trending' \
             INNER JOIN Watchlist w on s.ticker = w.value AND w.category in ('Portfolio','Watchlist') AND w.username = '" + userid + "'\
             where sm.isActive != 'N' and s.sScore <= 0\
-            order by s.sScore asc limit 200";
+            order by s.sScore asc,s.coverage desc limit 200";
     return executeQuery(sql);
 }
 
