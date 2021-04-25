@@ -302,8 +302,10 @@ function getTicker(params) {
 }
 
 function getStockMaster(ticker) {
-    sql = "SELECT sm.ticker,sm.company,sm.industry,sm.exchange,sm.country,sm.currency,sm.sector,sm.marketcap,ROUND(sm.PERatio,2) as PERatio,sm.DividendYield*100 as DividendYield,sm.EPS,sm.52WeekHigh,sm.52WeekLow, ROUND(sm.Price,2) as Price, ROUND(sm.openPrice,2) as openPrice,ROUND(sm.lowPrice,2) as lowPrice,ROUND(sm.highPrice,2) as highPrice,sm.volume,sm.lastClosingPrice,ROUND(sm.priceChangeDollar,2) as priceChangeDollar, ROUND(sm.priceChangePerc, 2) as priceChangePerc,sm.lastUpdatedDate,ROUND(sm.extendedHoursPrice,2) as extendedHoursPrice,ROUND(sm.extendedHoursChange,2) as extendedHoursChange, ROUND(sm.extendedHoursChangePerc,2) as extendedHoursChangePerc,sm.priceType, CASE WHEN w.category = 'Watchlist' THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio \
+    sql = "SELECT h.holding, h.holdingChange, s.sScore,  s.trendingScore, sm.ticker,sm.company,sm.industry,sm.exchange,sm.country,sm.currency,sm.sector,sm.marketcap,ROUND(sm.PERatio,2) as PERatio,sm.DividendYield*100 as DividendYield,sm.EPS,sm.52WeekHigh,sm.52WeekLow, ROUND(sm.Price,2) as Price, ROUND(sm.openPrice,2) as openPrice,ROUND(sm.lowPrice,2) as lowPrice,ROUND(sm.highPrice,2) as highPrice,sm.volume,sm.lastClosingPrice,ROUND(sm.priceChangeDollar,2) as priceChangeDollar, ROUND(sm.priceChangePerc, 2) as priceChangePerc,sm.lastUpdatedDate,ROUND(sm.extendedHoursPrice,2) as extendedHoursPrice,ROUND(sm.extendedHoursChange,2) as extendedHoursChange, ROUND(sm.extendedHoursChangePerc,2) as extendedHoursChangePerc,sm.priceType, CASE WHEN w.category = 'Watchlist' THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio \
             FROM Stock_Master sm \
+            LEFT OUTER JOIN Stock h ON sm.ticker = h.ticker and h.category = 'Portfolio' \
+            LEFT OUTER JOIN Stock s ON sm.ticker = s.ticker and s.category = 'Trending' \
             LEFT OUTER JOIN Watchlist w on sm.ticker = w.value AND w.username = '" + userid + "'\
             WHERE sm.isActive != 'N' and sm.ticker = '" + ticker + "' ";
     return executeQuery(sql);
