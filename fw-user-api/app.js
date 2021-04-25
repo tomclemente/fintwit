@@ -1535,6 +1535,6 @@ function deleteCognitoUser() {
 }
 
 function deleteWatchlist(username) {
-    sql = "DELETE FROM Watchlist WHERE email = '" + femail + "' ";
+    sql = "DELETE FROM Watchlist WHERE username = '" + userid + "' ";
     return executeQuery(sql);
 }
