@@ -1498,7 +1498,7 @@ function generateGoodbyeEmail() {
 }
 
 function updateName() {
-    sql = "UPDATE User SET name = '" + fname + "' \
+    sql = "UPDATE User SET name = '" + fname + "', username = '" + userid + "', createdOn =  CURRENT_TIMESTAMP() \
             WHERE email = '" + femail + "' ";
 
     return executeQuery(sql);
