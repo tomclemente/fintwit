@@ -49,7 +49,7 @@ exports.handler = async (event, context) => {
                             if (data[0].userType != 'ADMIN') {
                                 throw new Error ("Not Authorized");
                             } else {
-                                return updateInsight(params).then(resolve, reject);
+                                return updateInsightTraining(params).then(resolve, reject);
                             }
                         } else {                            
                             throw new Error("User not found.");
@@ -67,9 +67,9 @@ exports.handler = async (event, context) => {
                                 throw new Error ("Not Authorized");
                             } else {
                                 if (isEmpty(params)) {
-                                    return getInsight().then(resolve, reject);
+                                    return getInsightTraining().then(resolve, reject);
                                 } else {
-                                    return getInsightParams(params).then(resolve, reject);
+                                    return getInsightParamsTraining(params).then(resolve, reject);
                                 }
                                 
                             }
@@ -91,7 +91,7 @@ exports.handler = async (event, context) => {
                                 if (isEmpty(params)) {
                                     throw new Error ("ID Missing");
                                 } else {
-                                    return deleteInsight(params).then(resolve, reject);
+                                    return deleteInsightTraining(params).then(resolve, reject);
                                 }                                
                             }
                         } else {                            
@@ -234,6 +234,61 @@ function getInsightParams(params) {
 
 function deleteInsight(params) {
     sql = "DELETE FROM Insight \
+            WHERE ID = '" + params.id + "' ";
+            
+    return executeQuery(sql);
+}
+
+function  updateInsightTraining(params) {
+
+    let cond = "";
+
+    if (!isEmpty(params.class)) {
+        cond = cond.concat(" class = '" + params.class + "'");
+    }
+    if (!isEmpty(params.processed)) {
+        cond = cond.concat(" processed = '" + params.processed + "'");
+    }
+
+    sql = "UPDATE Insight_Training \
+            SET " + cond + " \
+            WHERE ID = '" + params.id + "'";
+
+    return executeQuery(sql);
+}
+
+function getInsightTraining() {
+    sql = "SELECT * FROM Insight_Training  \
+            WHERE processed ='N' LIMIT 100";
+
+    return executeQuery(sql);
+}
+
+function getInsightParamsTraining(params) {
+    let cond = "";
+
+    if (!isEmpty(params.date)) {
+        cond = cond.concat(" AND date(date) = '" + params.date + "'");
+    }
+     if (!isEmpty(params.tUserName)) {
+        cond = cond.concat(" AND tUserName = '" + params.tUserName + "'");
+    }
+     if (!isEmpty(params.class)) {
+        cond = cond.concat(" AND class = '" + params.class + "'");
+    }
+     if (!isEmpty(params.processed)) {
+        cond = cond.concat(" AND processed = '" + params.processed + "'");
+    }
+    cond = cond.concat(" LIMIT 100");
+
+    sql = "SELECT * FROM Insight_Training \
+            WHERE rawTweet is not null " + cond + "";
+
+    return executeQuery(sql);
+}
+
+function deleteInsightTraining(params) {
+    sql = "DELETE FROM Insight_Training \
             WHERE ID = '" + params.id + "' ";
             
     return executeQuery(sql);
