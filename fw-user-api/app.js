@@ -18,6 +18,7 @@ var userid;
 //cognito information
 var fname;
 var femail;
+var femailverified;
 
 exports.handler = async (event, context) => {
 
@@ -57,7 +58,12 @@ exports.handler = async (event, context) => {
                         fname = attrib.Value;
                     } else if (attrib.Name == 'email') {
                         femail = attrib.Value;
+                    } else if (attrib.Name == 'email_verified') {
+                        femailverified = attrib.Value;
                     } 
+
+
+                    
                 }
 
             }).then(function() {
@@ -77,17 +83,16 @@ exports.handler = async (event, context) => {
 
                             if (isEmpty(data)) {
 
-                                await insertUser(userid, fname, femail);
+                                await insertUser(userid, fname, femail,femailverified);
                                 await sendEmail(generateThankYouEmail());
                                 const resp = await getUser();
                                 resolve(resp);
                             
                             } else {
-
-                                if(data[0].name != fname){
-                                    await updateName();
-                                }
-                                resolve(data);
+    
+                                await updateName();
+                                const resp = await getUser();
+                                resolve(resp);
                             }       
 
                         }).catch(err => {
@@ -134,7 +139,7 @@ exports.handler = async (event, context) => {
                                 resp = await deleteUser(data[0].username);                            
                                 await deleteCognitoUser();
                                 await sendEmail(generateGoodbyeEmail());
-                                await deleteWatchlist(data[0].username);
+                               
 
                             } else {
                                 throw new Error("User is non existent. Unable to perform DELETE operation");
@@ -255,12 +260,14 @@ function getUser() {
     return executeQuery(sql);
 }
 
-function insertUser(username, name, email) {
+function insertUser(username, name, email,emailVerified) {
     var post = {
                 username: username, 
                 name: name, 
                 email: email, 
                 notificationFlag: "Y", 
+                subscriptionStatus: "FREE",
+                emailVerified: emailVerified,
                 userType: "USER"
             };
 
@@ -1498,7 +1505,7 @@ function generateGoodbyeEmail() {
 }
 
 function updateName() {
-    sql = "UPDATE User SET name = '" + fname + "', username = '" + userid + "', createdOn =  CURRENT_TIMESTAMP() \
+    sql = "UPDATE User SET name = '" + fname + "', username = '" + userid + "', emailVerified = '" + femailverified + "', createdOn =  CURRENT_TIMESTAMP() \
             WHERE email = '" + femail + "' ";
 
     return executeQuery(sql);
@@ -1520,7 +1527,7 @@ function updateSubscriptionNotification(username, params) {
 }
 
 function deleteUser(username) {
-        sql = "UPDATE User SET subscriptionStatus = null, clientSecretKey = null, oldPaymentMethodId = null, stripeCustomerId = null, subscriptionId = null, paymentMethodId = null \
+        sql = "UPDATE User SET subscriptionStatus = 'FREE', cancelledOn = CURRENT_TIMESTAMP(), plan = null, clientSecretKey = null, oldPaymentMethodId = null, stripeCustomerId = null, subscriptionId = null, paymentMethodId = null \
                WHERE email = '" + femail + "' ";
 
     return executeQuery(sql);
