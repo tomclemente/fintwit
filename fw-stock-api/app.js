@@ -54,6 +54,7 @@ exports.handler = async (event, context) => {
                 switch (event.httpMethod) {
                     case 'POST':      
                         getUser().then(async function(data) {
+
                             if (!isEmpty(data)) {
                                 resp = new Object();
 
@@ -117,6 +118,49 @@ exports.handler = async (event, context) => {
                                         resp["topholdings"] = await getStockTopHoldings();
                                     }
                                 
+                                } else if (data[0].subscriptionStatus == 'FREE') {
+
+                                    if (!isEmpty(params) && (params.watchlist == 'Y' || params.portfolio == 'Y' )) {
+
+                                        throw new Error("Not authorized");
+
+                                    } else if (!isEmpty(params) && !isEmpty(params.search)) {
+
+                                        resp = await getSearchList(params.search);
+                                    
+                                    } else if (!isEmpty(params) && !isEmpty(params.ticker)) {     
+                                        var result = await getStockMaster(params.ticker);
+                                        resp = result[0];
+                                        resp["Holding"] = await getHolding(params.ticker);                                        
+                                        resp["Sentiment"] = await getSentiment(params.ticker);
+                                        resp["Trending"] = await getTrending(params.ticker);
+                                        resp["Tweets"] = await getTweet(params.ticker);
+                                        resp["Investors"] = await getInvestors(params.ticker);
+                                        resp["Influencers"] = await getInfluencers(params.ticker);
+                                        resp["News"] = await getNews(params.ticker);
+
+                                        timedata = await getTimeSeries('5m', params.ticker);
+                                        timeseries['5m'] = timedata;
+
+                                        timedata = await getTimeSeries('30m', params.ticker);
+                                        timeseries['30m'] = timedata;
+
+                                        timedata = await getTimeSeries('Daily', params.ticker);
+                                        timeseries['Daily'] = timedata;
+
+                                        timedata = await getTimeSeries('Weekly', params.ticker);
+                                        timeseries['Weekly'] = timedata;
+
+                                        resp["Timeseries"] = timeseries;
+                                        
+                                    } else  {
+                                        resp["list"] = await getStockListFree();   
+                                        resp["hotstocks"] = await getStockHotStocksFree();
+                                        resp["positive"] = await getStockPositiveFree();
+                                        resp["negative"] = await getStockNegativeFree();
+                                        resp["topholdings"] = await getStockTopHoldingsFree();
+                                    }
+
                                 } else if (data[0].subscriptionStatus == 'INCOMPLETE' || data[0].subscriptionStatus == 'PAYMENT_FAILED') {
                                     resp = await getUser3DCardInfo();
 
@@ -199,9 +243,15 @@ function getUser() {
 function getSearchList(search) {
    
 
-    sql = "SELECT ticker, company \
+    sql = "SELECT distinct t.ticker, t.company FROM (SELECT ticker, company \
             FROM Stock_Master \
-            where isActive != 'N' AND LOWER(ticker) LIKE '" + search + "%' OR LOWER(company) LIKE '" + search + "%'";
+            where isActive != 'N' AND LOWER(ticker) = '" + search + "' UNION ALL \
+            SELECT ticker, company \
+            FROM Stock_Master \
+            where isActive != 'N' AND LOWER(ticker) LIKE '" + search + "%' UNION ALL \
+            SELECT ticker, company \
+            FROM Stock_Master \
+            where isActive != 'N' AND LOWER(company) LIKE '" + search + "%') t";
           
     return executeQuery(sql);
 }
@@ -303,6 +353,28 @@ function getStockList() {
     return executeQuery(sql);
 }
 
+function getStockListFree() {
+    sql = "(SELECT 'Top Buys' AS 'category',ROW_NUMBER() OVER (ORDER BY Count(pt.ticker) DESC, pt.lastMentioned DESC ) AS tickerRank,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,ROUND(sm.Price,2) as Price,sm.50DMA,sm.200DMA,ROUND(sm.priceChangeDollar,2) as priceChangeDollar,ROUND(sm.priceChangePerc,2) as priceChangePerc,sm.lastUpdatedDate,sm.priceType,CASE WHEN w.category = 'Watchlist' THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio \
+            FROM Portfolio_Trades pt \
+            INNER JOIN Stock_Master sm on pt.ticker = sm.ticker \
+            LEFT OUTER JOIN Watchlist w on pt.ticker = w.value AND w.username = '" + userid + "'\
+            where sm.isActive != 'N' and pt.class = 'BOUGHT' AND CAST(pt.lastMentioned as Date) >= (SELECT MAX(CAST(lastMentioned as Date)) - INTERVAL 7 DAY FROM Portfolio_Trades) \
+            GROUP BY pt.ticker limit 5) UNION ALL \
+            (SELECT 'Top Sells' AS 'category',ROW_NUMBER() OVER (ORDER BY Count(pt.ticker) DESC, pt.lastMentioned DESC ) AS tickerRank,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,ROUND(sm.Price,2) as Price,sm.50DMA,sm.200DMA,ROUND(sm.priceChangeDollar,2) as priceChangeDollar,ROUND(sm.priceChangePerc,2) as priceChangePerc,sm.lastUpdatedDate,sm.priceType,CASE WHEN w.category = 'Watchlist' THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio \
+            FROM Portfolio_Trades pt  \
+            INNER JOIN Stock_Master sm on pt.ticker = sm.ticker \
+            LEFT OUTER JOIN Watchlist w on pt.ticker = w.value AND w.username = '" + userid + "'\
+            where sm.isActive != 'N' and pt.class in ('SOLD','PARTIALSOLD') AND CAST(pt.lastMentioned as Date) >= (SELECT MAX(CAST(lastMentioned as Date)) - INTERVAL 7 DAY FROM Portfolio_Trades) \
+            GROUP BY pt.ticker limit 5) UNION ALL \
+           (SELECT s.category,ROW_NUMBER() OVER (ORDER BY s.trendingScore DESC ) AS tickerRank,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,ROUND(sm.Price,2) as Price,sm.50DMA,sm.200DMA,ROUND(sm.priceChangeDollar,2) as priceChangeDollar,ROUND(sm.priceChangePerc,2) as priceChangePerc,sm.lastUpdatedDate,sm.priceType,CASE WHEN w.category = 'Watchlist' THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio  \
+            FROM Stock s  \
+            INNER JOIN Stock_Master sm on s.ticker = sm.ticker and s.category = 'Trending' \
+            LEFT OUTER JOIN Watchlist w on s.ticker = w.value AND w.username = '" + userid + "'\
+            where sm.isActive != 'N' limit 5)"
+
+    return executeQuery(sql);
+}
+
 function getTicker(params) {
     sql = "SELECT * FROM StockChart \
             WHERE ticker = '" + params.ticker + "'";
@@ -310,34 +382,34 @@ function getTicker(params) {
 }
 
 function getStockMaster(ticker) {
-    sql = "SELECT h.holding, h.holdingChange, s.sScore,  s.trendingScore, CASE WHEN s.trendingScore > s2.trendingScore THEN 1 WHEN s.trendingScore < s2.trendingScore THEN -1 ELSE 0 END AS trendingChange,CASE WHEN s.sScore > s2.sScore THEN 1 WHEN s.sScore < s2.sScore THEN -1 ELSE 0 END AS sScoreChange, sm.ticker,sm.company,sm.industry,sm.exchange,sm.country,sm.currency,sm.sector,sm.marketcap,ROUND(sm.PERatio,2) as PERatio,sm.DividendYield*100 as DividendYield,sm.EPS,sm.52WeekHigh,sm.52WeekLow, ROUND(sm.Price,2) as Price, ROUND(sm.openPrice,2) as openPrice,ROUND(sm.lowPrice,2) as lowPrice,ROUND(sm.highPrice,2) as highPrice,sm.volume,sm.lastClosingPrice,ROUND(sm.priceChangeDollar,2) as priceChangeDollar, ROUND(sm.priceChangePerc, 2) as priceChangePerc,sm.lastUpdatedDate,ROUND(sm.extendedHoursPrice,2) as extendedHoursPrice,ROUND(sm.extendedHoursChange,2) as extendedHoursChange, ROUND(sm.extendedHoursChangePerc,2) as extendedHoursChangePerc,sm.priceType, CASE WHEN w.category = 'Watchlist' THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio \
+    sql = "SELECT h.holding, h.holdingChange, s.sScore,  s.trendingScore, CASE WHEN s.trendingScore > s2.trendingScore THEN 1 WHEN s.trendingScore < s2.trendingScore THEN -1 ELSE 0 END AS trendingChange,CASE WHEN s.sScore > s2.sScore THEN 1 WHEN s.sScore < s2.sScore THEN -1 ELSE 0 END AS sScoreChange, sm.ticker,sm.company,sm.industry,sm.exchange,sm.country,sm.currency,sm.sector,sm.marketCap,ROUND(sm.PERatio,2) as PERatio,sm.DividendYield*100 as DividendYield,sm.EPS,sm.52WeekHigh,sm.52WeekLow, ROUND(sm.Price,2) as Price, ROUND(sm.openPrice,2) as openPrice,ROUND(sm.lowPrice,2) as lowPrice,ROUND(sm.highPrice,2) as highPrice,sm.volume,sm.lastClosingPrice,ROUND(sm.priceChangeDollar,2) as priceChangeDollar, ROUND(sm.priceChangePerc, 2) as priceChangePerc,sm.lastUpdatedDate,ROUND(sm.extendedHoursPrice,2) as extendedHoursPrice,ROUND(sm.extendedHoursChange,2) as extendedHoursChange, ROUND(sm.extendedHoursChangePerc,2) as extendedHoursChangePerc,sm.priceType, CASE WHEN w.category = 'Watchlist' THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio \
             FROM Stock_Master sm \
             LEFT OUTER JOIN Stock h ON sm.ticker = h.ticker and h.category = 'Portfolio' \
             LEFT OUTER JOIN StockChart s ON sm.ticker = s.ticker and s.category = 'Trending' \
-            LEFT OUTER JOIN StockChart s2 ON s2.ticker = s.ticker and s2.category = s.category and s.date = DATE_ADD(s2.date, INTERVAL 1 DAY)  \
+            LEFT OUTER JOIN (SELECT ticker, category, sScore,  trendingScore, date FROM StockChart WHERE ticker = '" + ticker + "' and category = 'Trending' and date < (SELECT MAX(date) FROM StockChart) order by date desc limit 1) s2 ON s2.ticker = s.ticker \
             LEFT OUTER JOIN Watchlist w on sm.ticker = w.value AND w.username = '" + userid + "'\
             WHERE sm.isActive != 'N' and sm.ticker = '" + ticker + "' ORDER BY s.date DESC LIMIT 1 ";
     return executeQuery(sql);
 }
 
 function getHolding(ticker) {
-    sql = "SELECT ticker,date,holding FROM StockChart\
+    sql = "SELECT ticker,DATE_FORMAT(date, '%Y-%m-%d') as date,holding FROM StockChart\
             WHERE category = 'Portfolio' \
-            AND ticker = '" + ticker + "' LIMIT 60";
+            AND ticker = '" + ticker + "' ORDER BY date ASC LIMIT 61";
     return executeQuery(sql);
 }
 
 function getSentiment(ticker) {
-    sql = "SELECT ticker,date,sScore FROM StockChart\
+    sql = "SELECT ticker,DATE_FORMAT(date, '%Y-%m-%d') as date,sScore FROM StockChart\
             WHERE category = 'Trending' \
-            AND ticker = '" + ticker + "' LIMIT 60";
+            AND ticker = '" + ticker + "' ORDER BY date ASC LIMIT 61";
     return executeQuery(sql);
 }
 
 function getTrending(ticker) {
-    sql = "SELECT ticker,date,trendingScore FROM StockChart\
+    sql = "SELECT ticker,DATE_FORMAT(date, '%Y-%m-%d') as date,trendingScore FROM StockChart\
             WHERE category = 'Trending' \
-            AND ticker = '" + ticker + "' LIMIT 60";
+            AND ticker = '" + ticker + "' ORDER BY date ASC LIMIT 61";
     return executeQuery(sql);
 }
 
@@ -438,6 +510,50 @@ function getStockTopHoldings() {
             LEFT OUTER JOIN Watchlist w on s.ticker = w.value AND w.username = '" + userid + "'\
             where sm.isActive != 'N'\
             limit 200";
+
+
+    return executeQuery(sql);
+}
+
+function getStockPositiveFree() {
+    sql = " SELECT 'Positive' AS 'category',s.sScore, s.sScoreChange,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.Price,sm.50DMA,sm.200DMA,CASE WHEN w.category = 'Watchlist' THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio  \
+            FROM Stock s  \
+            INNER JOIN Stock_Master sm on s.ticker = sm.ticker and s.category = 'Trending' \
+            LEFT OUTER JOIN Watchlist w on s.ticker = w.value AND w.username = '" + userid + "'\
+            where sm.isActive != 'N' and s.sScore > 0 and s.coverage >= 1\
+            order by s.sScore desc, s.coverage desc  limit 5";
+    return executeQuery(sql);
+}
+
+function getStockNegativeFree() {
+    sql = "SELECT 'Negative' AS 'category',s.sScore, s.sScoreChange,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.Price,sm.50DMA,sm.200DMA,CASE WHEN w.category = 'Watchlist' THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio  \
+            FROM Stock s  \
+            INNER JOIN Stock_Master sm on s.ticker = sm.ticker and s.category = 'Trending' \
+            LEFT OUTER JOIN Watchlist w on s.ticker = w.value AND w.username = '" + userid + "'\
+            where sm.isActive != 'N' and s.sScore < 0 and s.coverage >= 1\
+            order by s.sScore asc,s.coverage desc  limit 5";
+    return executeQuery(sql);
+}
+
+function getStockHotStocksFree() {
+    sql = "SELECT 'Hot Stocks' AS 'category',ROW_NUMBER() OVER (ORDER BY s.holdingChangePerc DESC,s.coverage DESC ) AS tickerRank, s.holdingChangePerc,sm.ticker,sm.company,sm.sector,sm.marketCap,ROUND(sm.Price,2) as Price,ROUND(sm.priceChangeDollar,2) as priceChangeDollar,ROUND(sm.priceChangePerc,2) as priceChangePerc,CASE WHEN w.category = 'Watchlist'  THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio  \
+            FROM Stock s \
+            INNER JOIN Stock_Master sm on s.ticker = sm.ticker AND s.category = 'Portfolio' \
+            LEFT OUTER JOIN Watchlist w on s.ticker = w.value AND w.username = '" + userid + "'\
+            where sm.isActive != 'N' and s.holdingChange > 0\
+            limit 5";
+
+    return executeQuery(sql);
+}
+
+function getStockTopHoldingsFree() {
+
+    sql = "SELECT s.category,ROW_NUMBER() OVER (ORDER BY s.holding DESC ) AS tickerRank, s.holding,sm.ticker,sm.company,sm.sector,sm.marketCap,ROUND(sm.Price,2) as Price,ROUND(sm.priceChangeDollar,2) as priceChangeDollar,ROUND(sm.priceChangePerc,2) as priceChangePerc,CASE WHEN w.category = 'Watchlist' THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio \
+            FROM Stock s \
+            INNER JOIN Stock_Master sm on s.ticker = sm.ticker AND s.category = 'Portfolio' \
+            LEFT OUTER JOIN Watchlist w on s.ticker = w.value AND w.username = '" + userid + "'\
+            where sm.isActive != 'N'\
+            limit 5";
 
 
     return executeQuery(sql);
@@ -555,7 +671,7 @@ function getPWNegative() {
 }
 
 function getPWHotStocks() {
-    sql = "SELECT 'hotstocks' AS 'category',ROW_NUMBER() OVER (ORDER BY s.holdingChangePerc DESC,s.coverage DESC ) AS tickerRank, s.holdingChangePerc,sm.ticker,sm.company,sm.sector,sm.marketCap,ROUND(sm.Price,2) as Price,ROUND(sm.priceChangeDollar,2) as priceChangeDollar,ROUND(sm.priceChangePerc,2) as priceChangePerc,CASE WHEN w.category = 'Watchlist' THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio \
+    sql = "SELECT 'hotstocks' AS 'category',ROW_NUMBER() OVER (ORDER BY s.holdingChangePerc DESC,s.coverage DESC ) AS tickerRank, s.holdingChangePerc,sm.ticker,sm.company,sm.sector,sm.marketCap,ROUND(sm.Price,2) as Price,ROUND(sm.priceChangeDollar,2) as priceChangeDollar,ROUND(sm.priceChangePerc,2) as PRICE,CASE WHEN w.category = 'Watchlist' THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio \
             FROM Stock s \
             INNER JOIN Stock_Master sm on s.ticker = sm.ticker AND s.category = 'Portfolio' \
             INNER JOIN Watchlist w on s.ticker = w.value AND w.category in ('Portfolio','Watchlist') AND w.username = '" + userid + "'\
