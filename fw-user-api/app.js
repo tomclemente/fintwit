@@ -136,11 +136,10 @@ exports.handler = async (event, context) => {
 
                         getUser().then(async function(data) {                         
                             if (!isEmpty(data)) {
-                                resp = await deleteUser(data[0].username);                            
-                                await deleteCognitoUser();
+                                resp = await deleteUser(data[0].username);
                                 await sendEmail(generateGoodbyeEmail());
-                               
-
+                                await deleteCognitoUser().then(resolve, resolve);
+                            
                             } else {
                                 throw new Error("User is non existent. Unable to perform DELETE operation");
                             }                            
@@ -240,9 +239,10 @@ function getCognitoUser() {
 }
 
 function sendEmail(params) {
+    console.log("Sending Email: ", params);
+
     return new Promise((resolve, reject) => {
-        var ses = new AWS.SES({region: 'us-east-1'});
-        console.log("Sending Email: ", params);
+        var ses = new AWS.SES({region: 'us-east-1'});    
         ses.sendEmail(params, function (err, data) {
             if (err) {
                 console.log("Email Error: ", err);
