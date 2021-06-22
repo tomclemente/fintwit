@@ -20,6 +20,9 @@ var fname;
 var femail;
 var femailverified;
 
+var datetime = new Date();
+
+
 exports.handler = async (event, context) => {
 
     let params = JSON.parse(event["body"]);
@@ -37,6 +40,8 @@ exports.handler = async (event, context) => {
     
     let body;
     let statusCode = '200';
+
+    
 
     const headers = {
         'Content-Type': 'application/json',
@@ -268,7 +273,8 @@ function insertUser(username, name, email,emailVerified) {
                 notificationFlag: "Y", 
                 subscriptionStatus: "FREE",
                 emailVerified: emailVerified,
-                userType: "USER"          
+                userType: "USER",
+                trialStartDate: datetime.toISOString().slice(0,10)          
             };
 
     sql = "INSERT INTO User SET ?";
