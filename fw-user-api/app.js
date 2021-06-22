@@ -271,7 +271,7 @@ function insertUser(username, name, email,emailVerified) {
                 name: name, 
                 email: email, 
                 notificationFlag: "Y", 
-                subscriptionStatus: "FREE",
+                subscriptionStatus: "TRIALING",
                 emailVerified: emailVerified,
                 userType: "USER",
                 trialStartDate: datetime.toISOString().slice(0,10)          
