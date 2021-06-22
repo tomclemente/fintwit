@@ -261,7 +261,7 @@ function sendEmail(params) {
 };
 
 function getUser() {
-    sql = "SELECT username,email,userType,subscriptionStatus,notificationFlag,cancelledOn,expiryDt,plan,price,createdOn, name, amountDue, stripeCustomerId,paymentMethodId, clientSecretKey,actionRequired, isTrialAvailable, isWebhookCalled, oldPaymentMethodid,emailVerified,trialStartDate,trialStartDate+30 - CURDATE() as trialEndsIn FROM User WHERE email = '" + femail + "'";
+    sql = "SELECT username,email,userType,subscriptionStatus,notificationFlag,cancelledOn,expiryDt,plan,price,createdOn, name, amountDue, stripeCustomerId,paymentMethodId, clientSecretKey,actionRequired, isTrialAvailable, isWebhookCalled, oldPaymentMethodid,emailVerified,trialStartDate,30 - DATEDIFF(CURDATE(),trialStartDate) as trialEndsIn FROM User WHERE email = '" + femail + "'";
     return executeQuery(sql);
 }
 
