@@ -268,7 +268,8 @@ function insertUser(username, name, email,emailVerified) {
                 notificationFlag: "Y", 
                 subscriptionStatus: "FREE",
                 emailVerified: emailVerified,
-                userType: "USER"
+                userType: "USER",
+                trialStartDate: "CURDATE()"            
             };
 
     sql = "INSERT INTO User SET ?";
