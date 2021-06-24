@@ -49,7 +49,7 @@ exports.handler = async (event, context) => {
                             if (data[0].userType != 'ADMIN') {
                                 throw new Error ("Not Authorized");
                             } else {
-                                return updateInsightTraining(params).then(resolve, reject);
+                                return updateInsight(params).then(resolve, reject);
                             }
                         } else {                            
                             throw new Error("User not found.");
@@ -67,9 +67,9 @@ exports.handler = async (event, context) => {
                                 throw new Error ("Not Authorized");
                             } else {
                                 if (isEmpty(params)) {
-                                    return getInsightTraining().then(resolve, reject);
+                                    return getInsight().then(resolve, reject);
                                 } else {
-                                    return getInsightParamsTraining(params).then(resolve, reject);
+                                    return getInsightParams(params).then(resolve, reject);
                                 }
                                 
                             }
@@ -91,7 +91,7 @@ exports.handler = async (event, context) => {
                                 if (isEmpty(params)) {
                                     throw new Error ("ID Missing");
                                 } else {
-                                    return deleteInsightTraining(params).then(resolve, reject);
+                                    return deleteInsight(params).then(resolve, reject);
                                 }                                
                             }
                         } else {                            
