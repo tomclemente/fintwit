@@ -2,13 +2,13 @@ var mysql = require('mysql');
 var AWS = require('aws-sdk');
 
 var pool = mysql.createPool({
-    connectionLimit : 20,
-    host     : process.env.RDS_ENDPOINT,
-    user     : process.env.RDS_USERNAME,
-    password : process.env.RDS_PASSWORD,
-    database : process.env.RDS_DATABASE,
-    debug    :  false
-});    
+    connectionLimit: 20,
+    host: process.env.RDS_ENDPOINT,
+    user: process.env.RDS_USERNAME,
+    password: process.env.RDS_PASSWORD,
+    database: process.env.RDS_DATABASE,
+    debug: false
+});
 
 var sql;
 var userid;
@@ -17,23 +17,23 @@ exports.handler = async (event, context) => {
 
     let params = JSON.parse(event["body"]);
     console.log('Received event:', JSON.stringify(event, null, 2));
-    
+
     if (isEmpty(event.requestContext.authorizer.claims.username)) {
-      userid = event.requestContext.authorizer.claims["cognito:username"];
+        userid = event.requestContext.authorizer.claims["cognito:username"];
     } else {
-      userid = event.requestContext.authorizer.claims.username;
+        userid = event.requestContext.authorizer.claims.username;
     }
-    
+
     if (userid == null) {
         throw new Error("Username missing. Not authenticated.");
     }
-    
+
     let body;
     let statusCode = '200';
 
     const headers = {
         'Content-Type': 'application/json',
-        "Access-Control-Allow-Headers" : "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+        "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "OPTIONS,POST,GET,DELETE"
     };
@@ -44,22 +44,27 @@ exports.handler = async (event, context) => {
             switch (event.httpMethod) {
 
                 case 'GET':
-                    getStock().then(function(data) {
+                    getStock().then(function (data) {
                         resolve(data);
                     }, reject);
 
-                break;
+                    break;
 
-                case 'POST':      
-                    getWatchListLimit(params.category).then(function(data) {
-                        if (data[0].count > 100) {
-                            resolve({statusCode: '400', message: "Watchlist limit of 100 exceeded."});
-                        } else {
-                            insertStock(params.value, params.category).then(resolve, reject);    
-                        }                        
-                    });
+                case 'POST':
+                    if (params.category == 'Watchlist' || params.category == 'portfolio') {
+                        getWatchListLimit(params.category).then(function (data) {
+                            if (data[0].count > 100) {
+                                resolve({ statusCode: '400', message: "Watchlist limit of 100 exceeded." });
+                            } else {
+                                insertStock(params.value, params.category).then(resolve, reject);
+                            }
+                        });
+                        
+                    } else {
+                        return insertStock(params.value, params.category).then(resolve, reject);
+                    }
 
-                break;  
+                    break;
 
                 case 'DELETE':
                     return deleteStock(params.value).then(resolve, reject);
@@ -73,7 +78,7 @@ exports.handler = async (event, context) => {
         statusCode = '400';
         body = err;
         console.log("body return 1", err);
-        
+
     } finally {
         body = JSON.stringify(body);
     }
@@ -102,7 +107,7 @@ function executeQuery(sql) {
                 return;
             }
 
-            connection.query(sql, function(err, result) {
+            connection.query(sql, function (err, result) {
                 connection.release();
                 if (!err) {
                     console.log("Executed query: ", sql);
@@ -110,14 +115,14 @@ function executeQuery(sql) {
                     resolve(result);
                 } else {
                     reject(err);
-                }               
+                }
             });
         });
     });
 };
 
 function executePostQuery(sql, post) {
-    return new Promise((resolve, reject) => {                
+    return new Promise((resolve, reject) => {
         pool.getConnection((err, connection) => {
             if (err) {
                 console.log("executePostQuery error: ", err);
@@ -135,19 +140,19 @@ function executePostQuery(sql, post) {
                     reject(err);
                 }
             });
-        }); 
+        });
     });
 };
 
 function insertStock(value, category) {
     var post = {
-        username: userid, 
-        value: value, 
+        username: userid,
+        value: value,
         category: category,
     };
 
     sql = "REPLACE INTO Watchlist SET ?";
-    return executePostQuery(sql, post);   
+    return executePostQuery(sql, post);
 }
 
 function getStock() {
