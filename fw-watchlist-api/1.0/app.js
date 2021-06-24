@@ -156,7 +156,10 @@ function insertStock(value, category) {
 }
 
 function getStock() {
-    sql = "SELECT * FROM Watchlist WHERE username = '" + userid + "'";
+    sql = "SELECT w.username,w.value,w.category, sm.ticker,sm.company,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,ROUND(sm.Price,2) as Price,sm.50DMA,sm.200DMA,ROUND(sm.priceChangeDollar,2) as priceChangeDollar,ROUND(sm.priceChangePerc,2) as priceChangePerc,sm.lastUpdatedDate,sm.priceType \
+           FROM Watchlist w \
+           INNER JOIN Stock_Master sm on w.value = sm.ticker \
+           WHERE w.category in ('portfolio','Watchlist') and w.username = '" + userid + "' and sm.isActive != 'N'";
     return executeQuery(sql);
 }
 
