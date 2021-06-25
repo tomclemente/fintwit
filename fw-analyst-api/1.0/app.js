@@ -125,7 +125,8 @@ exports.handler = async (event, context) => {
                                 } else {
                                     resp["bio"] = await getAnalystBio(analyst);
                                     resp["holdings"] = await getAnalystHoldings(analyst);
-                                    resp["mentions"] = await getAnalystMentions(analyst);                    
+                                    resp["mentions"] = await getAnalystMentions(analyst); 
+                                    resp["trades"] = await getTopTradesStocks(analyst);   
                                     resp["conversations"] = await getAnalystConversations(analyst);
                                 }
 
@@ -362,6 +363,19 @@ function getMentions() {
             LIMIT 25";
 
     return executeQuery(sql);
+}
+
+
+function getTopTradesStocks(analyst) {
+
+    sql = "SELECT pt.class,pt.ticker,pt.lastMentioned,pt.dateAdded,CONCAT('https://twitter.com/',a.tUserName,'/status/',pt.tweetID) as 'tweetLink' \
+           FROM  Portfolio_Trades pt \
+           INNER JOIN Analyst a on pt.tUserID = a.tUserID\
+           WHERE pt.class in ('BOUGHT','SOLD','PARTIALSOLD') and pt.tUserID =  '" + analyst + "' \
+           ORDER BY pt.lastMentioned DESC \
+           LIMIT 50";
+
+    return executeQuery(sql);            
 }
 
 function getTopBuysStocks() {
