@@ -1,6 +1,8 @@
 var mysql = require('mysql');
 var AWS = require('aws-sdk');
 
+
+
 var pool = mysql.createPool({
     connectionLimit : 20,
     host     : process.env.RDS_ENDPOINT,
@@ -10,10 +12,14 @@ var pool = mysql.createPool({
     debug    :  false
 });    
 
+
+
 var sql;
 var userid;
 
 exports.handler = async (event, context) => {
+
+    console.log("TEST");
 
     let params = JSON.parse(event["body"]);
     console.log('Received event:', JSON.stringify(event, null, 2));
@@ -30,6 +36,7 @@ exports.handler = async (event, context) => {
     
     let body;
     let statusCode = '200';
+
 
     const headers = {
         'Content-Type': 'application/json',
@@ -67,9 +74,9 @@ exports.handler = async (event, context) => {
                                 throw new Error ("Not Authorized");
                             } else {
                                 if (isEmpty(params)) {
-                                    return getInsight().then(resolve, reject);
+                                    return getInsightTraining().then(resolve, reject);
                                 } else {
-                                    return getInsightParams(params).then(resolve, reject);
+                                    return getInsightParamsTraining(params).then(resolve, reject);
                                 }
                                 
                             }
