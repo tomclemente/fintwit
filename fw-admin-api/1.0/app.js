@@ -74,9 +74,9 @@ exports.handler = async (event, context) => {
                                 throw new Error ("Not Authorized");
                             } else {
                                 if (isEmpty(params)) {
-                                    return getInsightTraining().then(resolve, reject);
+                                    return getInsight().then(resolve, reject);
                                 } else {
-                                    return getInsightParamsTraining(params).then(resolve, reject);
+                                    return getInsightParams(params).then(resolve, reject);
                                 }
                                 
                             }
