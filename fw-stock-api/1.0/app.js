@@ -22,7 +22,10 @@ var timeseries = {
     'Weekly': []
 };
 
+
+
 exports.handler = async (event, context) => {
+
 
     let params = JSON.parse(event["body"]);
     console.log('Received event:', JSON.stringify(event, null, 2));
@@ -280,13 +283,13 @@ function getPWStocksFree(username) {
             FROM Portfolio_Trades pt \
             INNER JOIN Stock_Master sm on pt.ticker = sm.ticker \
             INNER JOIN Watchlist w on pt.ticker = w.value AND w.category in ('Portfolio','Watchlist') AND w.username = '" + userid + "' \
-            where sm.isActive != 'N' and pt.class = 'BOUGHT' AND CAST(pt.lastMentioned as Date) >= (SELECT MAX(CAST(lastMentioned as Date)) - INTERVAL 7 DAY FROM Portfolio_Trades) \
+            where sm.isActive != 'N' and pt.class = 'BOUGHT' AND CAST(pt.lastMentioned as Date) >= (SELECT MAX(CAST(lastMentioned as Date)) - INTERVAL 5 DAY FROM Portfolio_Trades) \
             GROUP BY pt.ticker limit 5 ) UNION ALL \
             (SELECT 'Top Sells' AS 'category',ROW_NUMBER() OVER (ORDER BY Count(pt.ticker) DESC, pt.lastMentioned DESC ) AS tickerRank,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,ROUND(sm.Price,2) as Price,sm.50DMA,sm.200DMA,ROUND(sm.priceChangeDollar,2) as priceChangeDollar,ROUND(sm.priceChangePerc,2) as priceChangePerc,sm.lastUpdatedDate,sm.priceType,CASE WHEN w.category = 'Watchlist' THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio \
             FROM Portfolio_Trades pt \
             INNER JOIN Stock_Master sm on pt.ticker = sm.ticker \
             INNER JOIN Watchlist w on pt.ticker = w.value AND w.category in ('Portfolio','Watchlist') AND w.username = '" + userid + "' \
-            where sm.isActive != 'N' and pt.class in ('SOLD','PARTIALSOLD') AND CAST(pt.lastMentioned as Date) >= (SELECT MAX(CAST(lastMentioned as Date)) - INTERVAL 7 DAY FROM Portfolio_Trades) \
+            where sm.isActive != 'N' and pt.class in ('SOLD','PARTIALSOLD') AND CAST(pt.lastMentioned as Date) >= (SELECT MAX(CAST(lastMentioned as Date)) - INTERVAL 5 DAY FROM Portfolio_Trades) \
             GROUP BY pt.ticker limit 5) UNION ALL \
            (SELECT s.category,ROW_NUMBER() OVER (ORDER BY s.trendingScore DESC ) AS tickerRank,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,ROUND(sm.Price,2) as Price,sm.50DMA,sm.200DMA,ROUND(sm.priceChangeDollar,2) as priceChangeDollar,ROUND(sm.priceChangePerc,2) as priceChangePerc,sm.lastUpdatedDate,sm.priceType, CASE WHEN w.category = 'Watchlist' THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio \
             FROM Stock s  \
@@ -308,13 +311,13 @@ function getPWStocks(username) {
             FROM Portfolio_Trades pt \
             INNER JOIN Stock_Master sm on pt.ticker = sm.ticker \
             INNER JOIN Watchlist w on pt.ticker = w.value AND w.category in ('Portfolio','Watchlist') AND w.username = '" + userid + "' \
-            where sm.isActive != 'N' and pt.class = 'BOUGHT' AND CAST(pt.lastMentioned as Date) >= (SELECT MAX(CAST(lastMentioned as Date)) - INTERVAL 7 DAY FROM Portfolio_Trades) \
+            where sm.isActive != 'N' and pt.class = 'BOUGHT' AND CAST(pt.lastMentioned as Date) >= (SELECT MAX(CAST(lastMentioned as Date)) - INTERVAL 5 DAY FROM Portfolio_Trades) \
             GROUP BY pt.ticker limit 200 ) UNION ALL \
             (SELECT 'Top Sells' AS 'category',ROW_NUMBER() OVER (ORDER BY Count(pt.ticker) DESC, pt.lastMentioned DESC ) AS tickerRank,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,ROUND(sm.Price,2) as Price,sm.50DMA,sm.200DMA,ROUND(sm.priceChangeDollar,2) as priceChangeDollar,ROUND(sm.priceChangePerc,2) as priceChangePerc,sm.lastUpdatedDate,sm.priceType,CASE WHEN w.category = 'Watchlist' THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio \
             FROM Portfolio_Trades pt \
             INNER JOIN Stock_Master sm on pt.ticker = sm.ticker \
             INNER JOIN Watchlist w on pt.ticker = w.value AND w.category in ('Portfolio','Watchlist') AND w.username = '" + userid + "' \
-            where sm.isActive != 'N' and pt.class in ('SOLD','PARTIALSOLD') AND CAST(pt.lastMentioned as Date) >= (SELECT MAX(CAST(lastMentioned as Date)) - INTERVAL 7 DAY FROM Portfolio_Trades) \
+            where sm.isActive != 'N' and pt.class in ('SOLD','PARTIALSOLD') AND CAST(pt.lastMentioned as Date) >= (SELECT MAX(CAST(lastMentioned as Date)) - INTERVAL 5 DAY FROM Portfolio_Trades) \
             GROUP BY pt.ticker limit 200) UNION ALL \
            (SELECT s.category,ROW_NUMBER() OVER (ORDER BY s.trendingScore DESC ) AS tickerRank,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,ROUND(sm.Price,2) as Price,sm.50DMA,sm.200DMA,ROUND(sm.priceChangeDollar,2) as priceChangeDollar,ROUND(sm.priceChangePerc,2) as priceChangePerc,sm.lastUpdatedDate,sm.priceType, CASE WHEN w.category = 'Watchlist' THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio \
             FROM Stock s  \
@@ -334,13 +337,13 @@ function getPortfolioStocksFree(username) {
            FROM Portfolio_Trades pt \
            INNER JOIN Stock_Master sm on pt.ticker = sm.ticker \
             INNER JOIN Watchlist w on pt.ticker = w.value AND w.category = 'Portfolio' AND w.username = '" + userid + "'\
-           where sm.isActive != 'N' and pt.class = 'BOUGHT' AND CAST(pt.lastMentioned as Date) >= (SELECT MAX(CAST(lastMentioned as Date)) - INTERVAL 7 DAY FROM Portfolio_Trades) \
+           where sm.isActive != 'N' and pt.class = 'BOUGHT' AND CAST(pt.lastMentioned as Date) >= (SELECT MAX(CAST(lastMentioned as Date)) - INTERVAL 5 DAY FROM Portfolio_Trades) \
            GROUP BY pt.ticker limit 5) UNION ALL \
             (SELECT 'Top Sells' AS 'category',ROW_NUMBER() OVER (ORDER BY Count(pt.ticker) DESC, pt.lastMentioned DESC ) AS tickerRank,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,ROUND(sm.Price,2) as Price,sm.50DMA,sm.200DMA,ROUND(sm.priceChangeDollar,2) as priceChangeDollar,ROUND(sm.priceChangePerc,2) as priceChangePerc,sm.lastUpdatedDate,sm.priceType,CASE WHEN w.category = 'Watchlist' THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio \
              FROM Portfolio_Trades pt \
              INNER JOIN Stock_Master sm on pt.ticker = sm.ticker \
             INNER JOIN Watchlist w on pt.ticker = w.value AND w.category = 'Portfolio' AND w.username = '" + userid + "'\
-             where sm.isActive != 'N' and pt.class in ('SOLD','PARTIALSOLD') AND CAST(pt.lastMentioned as Date) >= (SELECT MAX(CAST(lastMentioned as Date)) - INTERVAL 7 DAY FROM Portfolio_Trades) \
+             where sm.isActive != 'N' and pt.class in ('SOLD','PARTIALSOLD') AND CAST(pt.lastMentioned as Date) >= (SELECT MAX(CAST(lastMentioned as Date)) - INTERVAL 5 DAY FROM Portfolio_Trades) \
             GROUP BY pt.ticker limit 5) UNION ALL \
            (SELECT s.category,ROW_NUMBER() OVER (ORDER BY s.trendingScore DESC ) AS tickerRank,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,ROUND(sm.Price,2) as Price,sm.50DMA,sm.200DMA,ROUND(sm.priceChangeDollar,2) as priceChangeDollar,ROUND(sm.priceChangePerc,2) as priceChangePerc,sm.lastUpdatedDate,sm.priceType,false as watchlist, CASE WHEN w.value IS NULL THEN false ELSE true END AS portfolio \
             FROM Stock s  \
@@ -359,13 +362,13 @@ function getPortfolioStocks(username) {
            FROM Portfolio_Trades pt \
            INNER JOIN Stock_Master sm on pt.ticker = sm.ticker \
             INNER JOIN Watchlist w on pt.ticker = w.value AND w.category = 'Portfolio' AND w.username = '" + userid + "'\
-           where sm.isActive != 'N' and pt.class = 'BOUGHT' AND CAST(pt.lastMentioned as Date) >= (SELECT MAX(CAST(lastMentioned as Date)) - INTERVAL 7 DAY FROM Portfolio_Trades) \
+           where sm.isActive != 'N' and pt.class = 'BOUGHT' AND CAST(pt.lastMentioned as Date) >= (SELECT MAX(CAST(lastMentioned as Date)) - INTERVAL 5 DAY FROM Portfolio_Trades) \
            GROUP BY pt.ticker limit 200) UNION ALL \
             (SELECT 'Top Sells' AS 'category',ROW_NUMBER() OVER (ORDER BY Count(pt.ticker) DESC, pt.lastMentioned DESC ) AS tickerRank,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,ROUND(sm.Price,2) as Price,sm.50DMA,sm.200DMA,ROUND(sm.priceChangeDollar,2) as priceChangeDollar,ROUND(sm.priceChangePerc,2) as priceChangePerc,sm.lastUpdatedDate,sm.priceType,CASE WHEN w.category = 'Watchlist' THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio \
              FROM Portfolio_Trades pt \
              INNER JOIN Stock_Master sm on pt.ticker = sm.ticker \
             INNER JOIN Watchlist w on pt.ticker = w.value AND w.category = 'Portfolio' AND w.username = '" + userid + "'\
-             where sm.isActive != 'N' and pt.class in ('SOLD','PARTIALSOLD') AND CAST(pt.lastMentioned as Date) >= (SELECT MAX(CAST(lastMentioned as Date)) - INTERVAL 7 DAY FROM Portfolio_Trades) \
+             where sm.isActive != 'N' and pt.class in ('SOLD','PARTIALSOLD') AND CAST(pt.lastMentioned as Date) >= (SELECT MAX(CAST(lastMentioned as Date)) - INTERVAL 5 DAY FROM Portfolio_Trades) \
             GROUP BY pt.ticker limit 200) UNION ALL \
            (SELECT s.category,ROW_NUMBER() OVER (ORDER BY s.trendingScore DESC ) AS tickerRank,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,ROUND(sm.Price,2) as Price,sm.50DMA,sm.200DMA,ROUND(sm.priceChangeDollar,2) as priceChangeDollar,ROUND(sm.priceChangePerc,2) as priceChangePerc,sm.lastUpdatedDate,sm.priceType,false as watchlist, CASE WHEN w.value IS NULL THEN false ELSE true END AS portfolio \
             FROM Stock s  \
@@ -383,13 +386,13 @@ function getWatchListFree(username) {
            FROM Portfolio_Trades pt \
            INNER JOIN Stock_Master sm on pt.ticker = sm.ticker \
             INNER JOIN Watchlist w on pt.ticker = w.value AND w.category = 'Watchlist' AND w.username = '" + userid + "'\
-           where sm.isActive != 'N' and pt.class = 'BOUGHT' AND CAST(pt.lastMentioned as Date) >= (SELECT MAX(CAST(lastMentioned as Date)) - INTERVAL 7 DAY FROM Portfolio_Trades) \
+           where sm.isActive != 'N' and pt.class = 'BOUGHT' AND CAST(pt.lastMentioned as Date) >= (SELECT MAX(CAST(lastMentioned as Date)) - INTERVAL 5 DAY FROM Portfolio_Trades) \
            GROUP BY pt.ticker limit 5 ) UNION ALL \
             (SELECT 'Top Sells' AS 'category',ROW_NUMBER() OVER (ORDER BY Count(pt.ticker) DESC, pt.lastMentioned DESC ) AS tickerRank,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,ROUND(sm.Price,2) as Price,sm.50DMA,sm.200DMA,ROUND(sm.priceChangeDollar,2) as priceChangeDollar,ROUND(sm.priceChangePerc,2) as priceChangePerc,sm.lastUpdatedDate,sm.priceType,CASE WHEN w.category = 'Watchlist' THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio \
            FROM Portfolio_Trades pt \
             INNER JOIN Stock_Master sm on pt.ticker = sm.ticker \
             INNER JOIN Watchlist w on pt.ticker = w.value AND w.category = 'Watchlist' AND w.username = '" + userid + "'\
-            where sm.isActive != 'N' and pt.class in ('SOLD','PARTIALSOLD') AND CAST(pt.lastMentioned as Date) >=(SELECT MAX(CAST(lastMentioned as Date)) - INTERVAL 7 DAY FROM Portfolio_Trades) \
+            where sm.isActive != 'N' and pt.class in ('SOLD','PARTIALSOLD') AND CAST(pt.lastMentioned as Date) >=(SELECT MAX(CAST(lastMentioned as Date)) - INTERVAL 5 DAY FROM Portfolio_Trades) \
             GROUP BY pt.ticker limit 5) UNION ALL \
            (SELECT s.category,ROW_NUMBER() OVER (ORDER BY s.trendingScore DESC ) AS tickerRank,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,ROUND(sm.Price,2) as Price,sm.50DMA,sm.200DMA,ROUND(sm.priceChangeDollar,2) as priceChangeDollar,ROUND(sm.priceChangePerc,2) as priceChangePerc,sm.lastUpdatedDate,sm.priceType,CASE WHEN w.value IS NULL THEN false ELSE true END AS watchlist, false as portfolio  \
             FROM Stock s  \
@@ -408,13 +411,13 @@ function getWatchList(username) {
            FROM Portfolio_Trades pt \
            INNER JOIN Stock_Master sm on pt.ticker = sm.ticker \
             INNER JOIN Watchlist w on pt.ticker = w.value AND w.category = 'Watchlist' AND w.username = '" + userid + "'\
-           where sm.isActive != 'N' and pt.class = 'BOUGHT' AND CAST(pt.lastMentioned as Date) >= (SELECT MAX(CAST(lastMentioned as Date)) - INTERVAL 7 DAY FROM Portfolio_Trades) \
+           where sm.isActive != 'N' and pt.class = 'BOUGHT' AND CAST(pt.lastMentioned as Date) >= (SELECT MAX(CAST(lastMentioned as Date)) - INTERVAL 5 DAY FROM Portfolio_Trades) \
            GROUP BY pt.ticker limit 200 ) UNION ALL \
             (SELECT 'Top Sells' AS 'category',ROW_NUMBER() OVER (ORDER BY Count(pt.ticker) DESC, pt.lastMentioned DESC ) AS tickerRank,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,ROUND(sm.Price,2) as Price,sm.50DMA,sm.200DMA,ROUND(sm.priceChangeDollar,2) as priceChangeDollar,ROUND(sm.priceChangePerc,2) as priceChangePerc,sm.lastUpdatedDate,sm.priceType,CASE WHEN w.category = 'Watchlist' THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio \
            FROM Portfolio_Trades pt \
             INNER JOIN Stock_Master sm on pt.ticker = sm.ticker \
             INNER JOIN Watchlist w on pt.ticker = w.value AND w.category = 'Watchlist' AND w.username = '" + userid + "'\
-            where sm.isActive != 'N' and pt.class in ('SOLD','PARTIALSOLD') AND CAST(pt.lastMentioned as Date) >=(SELECT MAX(CAST(lastMentioned as Date)) - INTERVAL 7 DAY FROM Portfolio_Trades) \
+            where sm.isActive != 'N' and pt.class in ('SOLD','PARTIALSOLD') AND CAST(pt.lastMentioned as Date) >=(SELECT MAX(CAST(lastMentioned as Date)) - INTERVAL 5 DAY FROM Portfolio_Trades) \
             GROUP BY pt.ticker limit 200) UNION ALL \
            (SELECT s.category,ROW_NUMBER() OVER (ORDER BY s.trendingScore DESC ) AS tickerRank,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,ROUND(sm.Price,2) as Price,sm.50DMA,sm.200DMA,ROUND(sm.priceChangeDollar,2) as priceChangeDollar,ROUND(sm.priceChangePerc,2) as priceChangePerc,sm.lastUpdatedDate,sm.priceType,CASE WHEN w.value IS NULL THEN false ELSE true END AS watchlist, false as portfolio  \
             FROM Stock s  \
@@ -432,13 +435,13 @@ function getStockList() {
             FROM Portfolio_Trades pt \
             INNER JOIN Stock_Master sm on pt.ticker = sm.ticker \
             LEFT OUTER JOIN Watchlist w on pt.ticker = w.value AND w.username = '" + userid + "'\
-            where sm.isActive != 'N' and pt.class = 'BOUGHT' AND CAST(pt.lastMentioned as Date) >= (SELECT MAX(CAST(lastMentioned as Date)) - INTERVAL 7 DAY FROM Portfolio_Trades) \
+            where sm.isActive != 'N' and pt.class = 'BOUGHT' AND CAST(pt.lastMentioned as Date) >= (SELECT MAX(CAST(lastMentioned as Date)) - INTERVAL 5 DAY FROM Portfolio_Trades) \
             GROUP BY pt.ticker limit 300) UNION ALL \
             (SELECT 'Top Sells' AS 'category',ROW_NUMBER() OVER (ORDER BY Count(pt.ticker) DESC, pt.lastMentioned DESC ) AS tickerRank,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,ROUND(sm.Price,2) as Price,sm.50DMA,sm.200DMA,ROUND(sm.priceChangeDollar,2) as priceChangeDollar,ROUND(sm.priceChangePerc,2) as priceChangePerc,sm.lastUpdatedDate,sm.priceType,CASE WHEN w.category = 'Watchlist' THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio \
             FROM Portfolio_Trades pt  \
             INNER JOIN Stock_Master sm on pt.ticker = sm.ticker \
             LEFT OUTER JOIN Watchlist w on pt.ticker = w.value AND w.username = '" + userid + "'\
-            where sm.isActive != 'N' and pt.class in ('SOLD','PARTIALSOLD') AND CAST(pt.lastMentioned as Date) >= (SELECT MAX(CAST(lastMentioned as Date)) - INTERVAL 7 DAY FROM Portfolio_Trades) \
+            where sm.isActive != 'N' and pt.class in ('SOLD','PARTIALSOLD') AND CAST(pt.lastMentioned as Date) >= (SELECT MAX(CAST(lastMentioned as Date)) - INTERVAL 5 DAY FROM Portfolio_Trades) \
             GROUP BY pt.ticker limit 300) UNION ALL \
            (SELECT s.category,ROW_NUMBER() OVER (ORDER BY s.trendingScore DESC ) AS tickerRank,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,ROUND(sm.Price,2) as Price,sm.50DMA,sm.200DMA,ROUND(sm.priceChangeDollar,2) as priceChangeDollar,ROUND(sm.priceChangePerc,2) as priceChangePerc,sm.lastUpdatedDate,sm.priceType,CASE WHEN w.category = 'Watchlist' THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio  \
             FROM Stock s  \
@@ -454,13 +457,13 @@ function getStockListFree() {
             FROM Portfolio_Trades pt \
             INNER JOIN Stock_Master sm on pt.ticker = sm.ticker \
             LEFT OUTER JOIN Watchlist w on pt.ticker = w.value AND w.username = '" + userid + "'\
-            where sm.isActive != 'N' and pt.class = 'BOUGHT' AND CAST(pt.lastMentioned as Date) >= (SELECT MAX(CAST(lastMentioned as Date)) - INTERVAL 7 DAY FROM Portfolio_Trades) \
+            where sm.isActive != 'N' and pt.class = 'BOUGHT' AND CAST(pt.lastMentioned as Date) >= (SELECT MAX(CAST(lastMentioned as Date)) - INTERVAL 5 DAY FROM Portfolio_Trades) \
             GROUP BY pt.ticker limit 5) UNION ALL \
             (SELECT 'Top Sells' AS 'category',ROW_NUMBER() OVER (ORDER BY Count(pt.ticker) DESC, pt.lastMentioned DESC ) AS tickerRank,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,ROUND(sm.Price,2) as Price,sm.50DMA,sm.200DMA,ROUND(sm.priceChangeDollar,2) as priceChangeDollar,ROUND(sm.priceChangePerc,2) as priceChangePerc,sm.lastUpdatedDate,sm.priceType,CASE WHEN w.category = 'Watchlist' THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio \
             FROM Portfolio_Trades pt  \
             INNER JOIN Stock_Master sm on pt.ticker = sm.ticker \
             LEFT OUTER JOIN Watchlist w on pt.ticker = w.value AND w.username = '" + userid + "'\
-            where sm.isActive != 'N' and pt.class in ('SOLD','PARTIALSOLD') AND CAST(pt.lastMentioned as Date) >= (SELECT MAX(CAST(lastMentioned as Date)) - INTERVAL 7 DAY FROM Portfolio_Trades) \
+            where sm.isActive != 'N' and pt.class in ('SOLD','PARTIALSOLD') AND CAST(pt.lastMentioned as Date) >= (SELECT MAX(CAST(lastMentioned as Date)) - INTERVAL 5 DAY FROM Portfolio_Trades) \
             GROUP BY pt.ticker limit 5) UNION ALL \
            (SELECT s.category,ROW_NUMBER() OVER (ORDER BY s.trendingScore DESC ) AS tickerRank,sm.ticker,sm.company,sm.industry,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,ROUND(sm.Price,2) as Price,sm.50DMA,sm.200DMA,ROUND(sm.priceChangeDollar,2) as priceChangeDollar,ROUND(sm.priceChangePerc,2) as priceChangePerc,sm.lastUpdatedDate,sm.priceType,CASE WHEN w.category = 'Watchlist' THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio  \
             FROM Stock s  \
@@ -536,7 +539,7 @@ function getInfluencers(ticker) {
     sql = "SELECT c.tUserName,a.name,a.description,a.profilePicMini, CONCAT('https://twitter.com/',c.tUserName) as 'twitterID', ROUND(SUM(c.count)*100/(Select SUM(cm.count) from Conversation_Master cm where cm.granularity = 'daily' and cm.ticker = '" + ticker + "'),1) as 'Perc'\
            FROM Conversation_Master c \
            INNER JOIN Analyst a on c.tUserID = a.tUserID \
-           WHERE c.granularity = 'daily' and c.ticker = '" + ticker + "'\
+           WHERE a.followerCount > 5000 and c.granularity = 'daily' and c.ticker = '" + ticker + "'\
            GROUP BY c.tUserName \
            ORDER BY Perc desc \
            LIMIT 50";
@@ -548,7 +551,7 @@ function getInfluencers(ticker) {
 function getInvestors(ticker) {
     sql = "SELECT a.tUserName,a.name,a.description, a.profilePicMini,CONCAT('https://twitter.com/',a.tUserName) as 'twitterID', p.dateAdded from Portfolio_Master p\
             INNER JOIN Analyst a on p.tUserID = a.tUserID \
-            WHERE p.ticker = '" + ticker + "' \
+            WHERE a.followerCount > 5000 AND p.ticker = '" + ticker + "' \
             ORDER BY a.followerCount DESC \
             LIMIT 50";
 
