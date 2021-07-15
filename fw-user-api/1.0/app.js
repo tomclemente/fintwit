@@ -1,6 +1,7 @@
 var mysql = require('mysql');
 var AWS = require('aws-sdk');
 
+
 var sourceEmail = process.env.SOURCE_EMAIL;
 
 var pool = mysql.createPool({
@@ -279,7 +280,7 @@ function insertUser(username, name, email,emailVerified) {
 
     sql = "INSERT INTO User SET ?";
     return executePostQuery(sql, post);   
-}
+} 
 
 function generateThankYouEmail() {
     var param = {
@@ -600,6 +601,7 @@ function generateThankYouEmail() {
 
     return param;
 }
+
 
 function generateDeactivateEmail() {
     var param = {
@@ -1510,7 +1512,7 @@ function generateGoodbyeEmail() {
 }
 
 function updateName() {
-    sql = "UPDATE User SET name = '" + fname + "', username = '" + userid + "', emailVerified = '" + femailverified + "' \
+    sql = "UPDATE User SET name = '" + fname + "', username = '" + userid + "', deletedOn = null, emailVerified = '" + femailverified + "' \
             WHERE email = '" + femail + "' ";
 
     return executeQuery(sql);
@@ -1532,7 +1534,7 @@ function updateSubscriptionNotification(username, params) {
 }
 
 function deleteUser(username) {
-        sql = "UPDATE User SET subscriptionStatus = 'FREE', cancelledOn = CURRENT_TIMESTAMP(), plan = null, clientSecretKey = null, oldPaymentMethodId = null, stripeCustomerId = null, subscriptionId = null, paymentMethodId = null \
+        sql = "UPDATE User SET subscriptionStatus = 'FREE', deletedOn = CURRENT_TIMESTAMP(), plan = null, clientSecretKey = null, oldPaymentMethodId = null, stripeCustomerId = null, subscriptionId = null, paymentMethodId = null \
                WHERE email = '" + femail + "' ";
 
     return executeQuery(sql);
