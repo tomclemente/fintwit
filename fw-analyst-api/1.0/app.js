@@ -43,7 +43,7 @@ exports.handler = async (event, context) => {
     try {
 
         body = await new Promise((resolve, reject) => {
-
+                resp = new Object();
                 switch (event.httpMethod) {
                     
                     case 'POST':      
