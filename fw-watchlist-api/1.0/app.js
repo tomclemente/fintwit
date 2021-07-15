@@ -13,6 +13,7 @@ var pool = mysql.createPool({
 var sql;
 var userid;
 
+
 exports.handler = async (event, context) => {
 
     let params = JSON.parse(event["body"]);
@@ -155,6 +156,7 @@ function insertStock(value, category) {
     return executePostQuery(sql, post);
 }
 
+//returns stocks details 
 function getStock() {
     sql = "SELECT w.username,w.value,w.category, sm.ticker,sm.company,sm.sector,sm.marketCap,sm.52WeekHigh,sm.52WeekLow,ROUND(sm.Price,2) as Price,sm.50DMA,sm.200DMA,ROUND(sm.priceChangeDollar,2) as priceChangeDollar,ROUND(sm.priceChangePerc,2) as priceChangePerc,sm.lastUpdatedDate,sm.priceType \
            FROM Watchlist w \
