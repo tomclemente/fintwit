@@ -2,7 +2,6 @@ var mysql = require('mysql');
 var AWS = require('aws-sdk');
 
 
-
 var pool = mysql.createPool({
     connectionLimit : 20,
     host     : process.env.RDS_ENDPOINT,
@@ -12,14 +11,10 @@ var pool = mysql.createPool({
     debug    :  false
 });    
 
-
-
 var sql;
 var userid;
 
 exports.handler = async (event, context) => {
-
-    console.log("TEST");
 
     let params = JSON.parse(event["body"]);
     console.log('Received event:', JSON.stringify(event, null, 2));
@@ -66,6 +61,7 @@ exports.handler = async (event, context) => {
                     });
 
                 break;
+                
 
                 case 'POST':
                     getUser().then(function(data) {
@@ -211,7 +207,7 @@ function  updateInsight(params) {
 function getInsight() {
     sql = "SELECT * FROM Insight  \
             WHERE class IN ('PORTFOLIO','BOUGHT','SOLD','PARTIALSOLD') \
-            AND processed ='N' LIMIT 100";
+            AND processed ='N'";
 
     return executeQuery(sql);
 }
@@ -231,7 +227,6 @@ function getInsightParams(params) {
      if (!isEmpty(params.processed)) {
         cond = cond.concat(" AND processed = '" + params.processed + "'");
     }
-    cond = cond.concat(" LIMIT 100");
 
     sql = "SELECT * FROM Insight \
             WHERE rawTweet is not null " + cond + "";
