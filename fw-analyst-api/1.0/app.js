@@ -19,6 +19,7 @@ exports.handler = async (event, context) => {
     let params = JSON.parse(event["body"]);
     console.log('Received event:', JSON.stringify(event, null, 2));
     
+    
     if (isEmpty(event.requestContext.authorizer.claims.username)) {
       userid = event.requestContext.authorizer.claims["cognito:username"];
     } else {
@@ -91,6 +92,7 @@ exports.handler = async (event, context) => {
 
                             break;
     
+
                             case 'insight':
                                 if (params.analyst == 'ALL_ANALYST') {
                                     resp["followers"] = await getFollowerCount();                                    
@@ -331,41 +333,51 @@ function getWatchListTickerFollowedAnalyst() {
 function getFollowerCount() {
     sql = "SELECT tUserID, tUserName,name,description, \
             profilePicMini,followerCount, CONCAT('https://twitter.com/',tUserName) as 'twitterID' \
-            FROM Analyst ORDER BY  followerCount desc";
+            FROM Analyst ORDER BY  followerCount desc LIMIT 100";
 
     return executeQuery(sql);            
 }
 
 function getActivity() {
     sql = "SELECT c.tUserID, c.tUserName,a.name,a.description, \
-            a.profilePicMini, followerCount, \
+            a.profilePicMini, a.followerCount, \
             CONCAT('https://twitter.com/',c.tUserName) as 'twitterID', SUM(c.count) as posts \
             FROM Conversation_Master c \
             INNER JOIN Analyst a ON c.tUserID = a.tUserID \
             WHERE c.granularity = 'daily' \
             GROUP BY c.tUserName \
-            ORDER BY posts desc";
+            ORDER BY posts desc LIMIT 100";
 
     return executeQuery(sql);   
 }
 
 function getHoldings() {
-    sql = "SELECT ticker, holding FROM Stock ORDER BY holding desc LIMIT 100";
+
+    sql = "SELECT s.category,ROW_NUMBER() OVER (ORDER BY s.holding DESC ) AS tickerRank, s.holding,sm.ticker,sm.company,sm.sector,sm.marketCap,ROUND(sm.Price,2) as Price,ROUND(sm.priceChangeDollar,2) as priceChangeDollar,ROUND(sm.priceChangePerc,2) as priceChangePerc,CASE WHEN w.category = 'Watchlist' THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio \
+            FROM Stock s \
+            INNER JOIN Stock_Master sm on s.ticker = sm.ticker AND s.category = 'Portfolio' \
+            LEFT OUTER JOIN Watchlist w on s.ticker = w.value AND w.username = '" + userid + "'\
+            where sm.isActive != 'N'\
+            limit 100";
+
     return executeQuery(sql);
 }
 
 function getMentions() {
     sql = "SELECT c.ticker, SUM(c.count) as mentions \
             FROM Conversation_Master c \
-            WHERE c.granularity = 'daily'  and c.date > CURDATE() - 7 \
+            WHERE c.granularity = 'daily'  and c.date > CURDATE() - 3 \
             GROUP BY c.ticker \
             ORDER BY mentions desc \
-            LIMIT 25";
+            LIMIT 20";
 
     return executeQuery(sql);
 }
 
 
+
+
+// Recent trades
 function getTopTradesStocks(analyst) {
 
     sql = "SELECT pt.class,pt.ticker,pt.lastMentioned,pt.dateAdded,CONCAT('https://twitter.com/',a.tUserName,'/status/',pt.tweetID) as 'tweetLink' \
@@ -382,7 +394,7 @@ function getTopBuysStocks() {
 
     sql = "SELECT pt.ticker,count(pt.ticker) \
            FROM  Portfolio_Trades pt \
-           WHERE pt.class = 'BOUGHT' AND CAST(pt.lastMentioned as Date) >= (SELECT MAX(CAST(lastMentioned as Date)) - INTERVAL 7 DAY FROM Portfolio_Trades) \
+           WHERE pt.class = 'BOUGHT' AND CAST(pt.lastMentioned as Date) >= (SELECT MAX(CAST(lastMentioned as Date)) - INTERVAL 3 DAY FROM Portfolio_Trades) \
            GROUP BY pt.ticker \
            ORDER BY count(pt.ticker) DESC \
            LIMIT 20";
@@ -396,7 +408,7 @@ function getTopSellsStocks() {
     
     sql = "SELECT pt.ticker,count(pt.ticker) \
            FROM  Portfolio_Trades pt \
-           WHERE pt.class = ('SOLD','PARTIALSOLD') AND CAST(pt.lastMentioned as Date) >= (SELECT MAX(CAST(lastMentioned as Date)) - INTERVAL 7 DAY FROM Portfolio_Trades) \
+           WHERE pt.class in ('SOLD','PARTIALSOLD') AND CAST(pt.lastMentioned as Date) >= (SELECT MAX(CAST(lastMentioned as Date)) - INTERVAL 3 DAY FROM Portfolio_Trades) \
            GROUP BY pt.ticker \
            ORDER BY count(pt.ticker) DESC \
            LIMIT 20";
@@ -412,7 +424,7 @@ function getConversations() {
             FROM Conversation_Master c \
             WHERE c.granularity = 'daily'  and c.date > CURDATE() - 7 \
             GROUP BY c.ticker \
-            ORDER BY mentions desc LIMIT 25) top25 on cm.ticker = top25.ticker \
+            ORDER BY mentions desc LIMIT 20) top20 on cm.ticker = top20.ticker \
             WHERE cm.granularity = 'daily' and cm.Date > CURDATE() - 30 \
             GROUP BY cm.ticker, cm.Date \
             ORDER BY cm.ticker desc, Date desc";
@@ -425,7 +437,7 @@ function getFollowFollowerCount() {
     sql = "SELECT a.tUserID, a.tUserName,a.name,a.description, a.profilePicMini,a.followerCount, CONCAT('https://twitter.com/',a.tUserName) as 'twitterID' \
             FROM Analyst a \
             INNER JOIN Watchlist w on a.tUserID = w.value AND w.category = 'Analyst' AND w.username = '" + userid + "' \
-            ORDER BY  a.followerCount desc";
+            ORDER BY  a.followerCount desc LIMIT 100";
 
     return executeQuery(sql);            
 }
@@ -439,17 +451,21 @@ function getFollowActivity() {
             INNER JOIN Watchlist w on a.tUserID = w.value AND w.category = 'Analyst' AND w.username = '" + userid + "' \
             WHERE c.granularity = 'daily' \
             GROUP BY c.tUserName \
-            ORDER BY posts desc";
+            ORDER BY posts desc LIMIT 100";
 
     return executeQuery(sql);   
 }
 
 function getFollowHoldings() {
-    sql = "SELECT pm.ticker,COUNT(distinct pm.tUserID) as holding \
-    FROM  Portfolio_Master pm \
-    INNER JOIN Watchlist w on pm.tUserID = w.value AND w.category = 'Analyst' AND w.username = '" + userid + "' \
-    GROUP BY pm.ticker \
-    ORDER BY holding desc LIMIT 100";
+
+    sql = "SELECT pm.ticker, count(pm.tUserID), ROW_NUMBER() OVER (ORDER BY Count(pm.ticker) DESC),CASE WHEN w.category = 'Watchlist' THEN true ELSE false END AS watchlist,CASE WHEN w.category = 'Portfolio' THEN true ELSE false END AS portfolio \
+            FROM Portfolio_Master pm \
+            INNER JOIN Stock_Master sm on pm.ticker = sm.ticker \
+            INNER JOIN Watchlist aw on pm.tUserID = aw.value AND aw.category = 'Analyst' AND aw.username = '" + userid + "' \
+            LEFT OUTER JOIN Watchlist w on pm.ticker = w.value AND w.username = '" + userid + "' \
+            WHERE sm.isActive != 'N'\
+            GROUP BY pm.ticker \
+            limit 100";
 
     return executeQuery(sql);
 }
@@ -458,10 +474,10 @@ function getFollowMentions() {
     sql = "SELECT c.ticker, SUM(c.count) as mentions \
             FROM Conversation_Master c \
             INNER JOIN Watchlist w on c.tUserID = w.value AND w.category = 'Analyst' AND w.username = '" + userid + "' \
-            WHERE c.granularity = 'daily'  and c.date > CURDATE() - 7 \
+            WHERE c.granularity = 'daily'  and c.date > CURDATE() - 3 \
             GROUP BY c.ticker \
             ORDER BY mentions desc \
-            LIMIT 25";
+            LIMIT 20";
 
     return executeQuery(sql);
 }
@@ -470,8 +486,9 @@ function getFollowMentions() {
 function getFollowTopBuysStocks() {
 
     sql = "SELECT pt.ticker,count(pt.ticker) \
+           FROM Portfolio_Trades pt \
            INNER JOIN Watchlist w on pt.tUserID = w.value AND w.category = 'Analyst' AND w.username = '" + userid + "' \
-           WHERE pt.class = 'BOUGHT' AND CAST(pt.lastMentioned as Date) >= (SELECT MAX(CAST(lastMentioned as Date)) - INTERVAL 7 DAY FROM Portfolio_Trades) \
+           WHERE pt.class = 'BOUGHT' AND CAST(pt.lastMentioned as Date) >= (SELECT MAX(CAST(lastMentioned as Date)) - INTERVAL 3 DAY FROM Portfolio_Trades) \
            GROUP BY pt.ticker \
            ORDER BY count(pt.ticker) DESC \
            LIMIT 20";
@@ -485,7 +502,7 @@ function getFollowTopSellsStocks() {
     sql = "SELECT pt.ticker,count(pt.ticker) \
            FROM Portfolio_Trades pt \
            INNER JOIN Watchlist w on pt.tUserID = w.value AND w.category = 'Analyst' AND w.username = '" + userid + "' \
-           WHERE pt.class in ('SOLD','PARTIALSOLD') AND CAST(pt.lastMentioned as Date) >= (SELECT MAX(CAST(lastMentioned as Date)) - INTERVAL 7 DAY FROM Portfolio_Trades) \
+           WHERE pt.class in ('SOLD','PARTIALSOLD') AND CAST(pt.lastMentioned as Date) >= (SELECT MAX(CAST(lastMentioned as Date)) - INTERVAL 3 DAY FROM Portfolio_Trades) \
            GROUP BY pt.ticker \
            ORDER BY count(pt.ticker) DESC \
            LIMIT 20";
@@ -504,7 +521,7 @@ function getFollowConversations() {
             FROM Conversation_Master c \
             WHERE c.granularity = 'daily'  and c.date > CURDATE() - 7 \
             GROUP BY c.ticker \
-            ORDER BY mentions desc LIMIT 25) top25 on cm.ticker = top25.ticker \
+            ORDER BY mentions desc LIMIT 20) top20 on cm.ticker = top20.ticker \
             WHERE cm.granularity = 'daily' and cm.Date > CURDATE() - 30 \
             GROUP BY cm.ticker, cm.Date \
             ORDER BY cm.ticker desc, Date desc";
